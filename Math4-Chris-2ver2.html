@@ -16,7 +16,7 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 8mm;
+        margin: 15mm;
       }
       body {
         background-color: white !important;
@@ -440,8 +440,8 @@
             </div>
           </div>
 
-          {/* 測驗卷主體 (螢幕顯示時最大化寬度，列印時釋放寬度填滿紙張) */}
-          <div className="w-full max-w-[98%] 2xl:max-w-[95%] mx-auto bg-white shadow-xl print:w-full print:max-w-full print:shadow-none min-h-[297mm] p-4 md:p-8 lg:p-12 print:p-0 print:m-0">
+          {/* 測驗卷主體 (螢幕顯示時最大化寬度，列印時維持 A4 尺寸) */}
+          <div className="w-full max-w-[98%] 2xl:max-w-[95%] mx-auto bg-white shadow-xl print:w-[210mm] print:max-w-[210mm] print:shadow-none min-h-[297mm] p-4 md:p-8 lg:p-12 print:p-0 print:m-0">
             
             {/* 試卷表頭 */}
             <div className="text-center mb-8 border-b-2 border-gray-800 pb-4">
@@ -465,8 +465,8 @@
                     const questionContent = (
                       <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-row border-b border-gray-300 ${printMode === 'exam' ? 'pb-4 print:pb-3' : 'pb-8 print:pb-8'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
                         
-                        {/* 左側：題目區 (寬度加大至 60%，列印時縮小右側留白) */}
-                        <div className="w-[60%] pr-4 md:pr-6 print:pr-3 border-r-2 border-dashed border-gray-300">
+                        {/* 左側：題目區 (寬度加大至 60%) */}
+                        <div className="w-[60%] pr-4 md:pr-6 border-r-2 border-dashed border-gray-300">
                           <div className="flex gap-2">
                             <span className="font-bold text-xl text-indigo-800 shrink-0">
                               P{q.page}-{q.id}.
@@ -506,8 +506,8 @@
                           )}
                         </div>
 
-                        {/* 右側：解析區 (寬度縮小至 40%，列印時縮小左側留白) */}
-                        <div className="w-[40%] pl-4 md:pl-6 print:pl-3 relative">
+                        {/* 右側：解析區 (寬度縮小至 40%) */}
+                        <div className="w-[40%] pl-4 md:pl-6 relative">
                           {/* 考卷模式下將原 h-full 加上 print:hidden，徹底釋放高度，讓左側題目決定此題行高 */}
                           <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
                             <div className="flex items-center gap-2 mb-4 text-blue-800">
