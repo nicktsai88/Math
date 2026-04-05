@@ -671,8 +671,9 @@
                                   alt="題目附圖" 
                                   className="max-w-full w-[80%] h-auto rounded border border-gray-200 shadow-sm print:shadow-none print:border-gray-400" 
                                   onError={(e) => { 
-                                    e.target.onerror = null; 
-                                    e.target.src = 'https://via.placeholder.com/400x200?text=圖片待載入'; 
+                                    if (e.target.dataset.errorHandled) return;
+                                    e.target.dataset.errorHandled = true;
+                                    e.target.src = 'https://placehold.co/400x200?text=' + encodeURIComponent('圖片待載入'); 
                                   }}
                                 />
                               ))}
@@ -709,8 +710,9 @@
                                     alt="解析附圖" 
                                     className="max-w-full w-[80%] md:w-[60%] h-auto rounded shadow-sm border border-blue-200 print:shadow-none print:border-gray-400"
                                     onError={(e) => { 
-                                      e.target.onerror = null; 
-                                      e.target.src = 'https://via.placeholder.com/300x150?text=解析圖片待載入'; 
+                                      if (e.target.dataset.errorHandled) return;
+                                      e.target.dataset.errorHandled = true;
+                                      e.target.src = 'https://placehold.co/300x150?text=' + encodeURIComponent('解析圖片待載入'); 
                                     }}
                                   />
                                 </div>
