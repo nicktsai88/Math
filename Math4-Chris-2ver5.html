@@ -402,7 +402,7 @@
         return a.id - b.id;                            // 頁碼相同時，依照題號
       });
 
-      // 處理分頁邏輯：第1頁6題，第2頁起每頁7題
+      // 處理分頁邏輯：第1頁6題，第2頁起每頁8題
       let currentGroup = "";
       const processedQuestions = sortedQuestions.map((q) => {
         const groupName = q.source;
@@ -418,7 +418,7 @@
         pages.push(remaining.splice(0, 6)); // 第1頁: 最多顯示 6 題
       }
       while (remaining.length > 0) {
-        pages.push(remaining.splice(0, 7)); // 第2頁起: 最多顯示 7 題
+        pages.push(remaining.splice(0, 8)); // 第2頁起: 最多顯示 8 題
       }
 
       return (
