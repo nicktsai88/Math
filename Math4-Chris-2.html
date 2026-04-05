@@ -465,18 +465,15 @@
                     const questionContent = (
                       <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-row border-b border-gray-300 ${printMode === 'exam' ? 'pb-4 print:pb-3' : 'pb-8 print:pb-8'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
                         
-                        {/* 左側：題目區 (寬度維持 60%) */}
-                        <div className="w-[60%] pr-4 md:pr-6 print:pr-3 border-r-2 border-dashed border-gray-300">
-                          <div className="flex gap-2">
-                            <span className="font-bold text-xl text-indigo-800 shrink-0">
-                              P{q.page}-{q.id}.
-                            </span>
-                            {q.question && (
+                        {/* 左側：題目區 (寬度維持 65%) */}
+                        <div className="w-[65%] pr-4 md:pr-6 print:pr-3 border-r-2 border-dashed border-gray-300">
+                          {q.question && (
+                            <div className="flex gap-2">
                               <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
                                 {q.question}
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          )}
                           
                           {/* 支援單圖或多圖顯示 (移除 pl-6 縮排，加入 w-full 最大化寬度) */}
                           {q.imageUrl && (
@@ -507,8 +504,8 @@
                           )}
                         </div>
 
-                        {/* 右側：解析區 (寬度維持 40%) */}
-                        <div className="w-[40%] pl-4 md:pl-6 print:pl-3 relative">
+                        {/* 右側：解析區 (寬度維持 35%) */}
+                        <div className="w-[35%] pl-4 md:pl-6 print:pl-3 relative">
                           {/* 考卷模式下將原 h-full 加上 print:hidden，徹底釋放高度，讓左側題目決定此題行高 */}
                           <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
                             <div className="flex items-center gap-2 mb-4 text-blue-800">
