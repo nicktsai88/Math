@@ -465,7 +465,7 @@
                     const questionContent = (
                       <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-row border-b border-gray-300 ${printMode === 'exam' ? 'pb-4 print:pb-3' : 'pb-8 print:pb-8'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
                         
-                        {/* 左側：題目區 (寬度維持 60%) */}
+                        {/* 左側：題目區 (寬度加大至 60%，列印時縮小右側留白) */}
                         <div className="w-[60%] pr-4 md:pr-6 print:pr-3 border-r-2 border-dashed border-gray-300">
                           <div className="flex gap-2">
                             <span className="font-bold text-xl text-indigo-800 shrink-0">
@@ -478,9 +478,9 @@
                             )}
                           </div>
                           
-                          {/* 支援單圖或多圖顯示 (移除 pl-6 縮排，加入 w-full 最大化寬度) */}
+                          {/* 支援單圖或多圖顯示 (加入 onError 處理本機圖片載入失敗的情況) */}
                           {q.imageUrl && (
-                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-1' : 'mt-3 mb-2'} w-full flex flex-col gap-2`}>
+                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-1' : 'mt-4 mb-2'} pl-6 flex flex-col gap-2`}>
                               {(Array.isArray(q.imageUrl) ? q.imageUrl : [q.imageUrl]).map((img, idx) => (
                                 <img 
                                   key={idx} 
@@ -497,9 +497,8 @@
                             </div>
                           )}
 
-                          {/* 選項區塊也同步移除 pl-6 縮排 */}
                           {q.options && q.options.length > 0 && (
-                            <div className={`${printMode === 'exam' ? 'mt-2 print:mt-1' : 'mt-3'} w-full flex flex-col ${printMode === 'exam' ? 'gap-1 print:gap-0' : 'gap-2'} text-lg`}>
+                            <div className={`${printMode === 'exam' ? 'mt-2 print:mt-1' : 'mt-4'} pl-6 flex flex-col ${printMode === 'exam' ? 'gap-1 print:gap-0' : 'gap-2'} text-lg`}>
                               {q.options.map((opt, idx) => (
                                 <div key={idx} className="text-gray-700">{opt}</div>
                               ))}
@@ -507,7 +506,7 @@
                           )}
                         </div>
 
-                        {/* 右側：解析區 (寬度維持 40%) */}
+                        {/* 右側：解析區 (寬度縮小至 40%，列印時縮小左側留白) */}
                         <div className="w-[40%] pl-4 md:pl-6 print:pl-3 relative">
                           {/* 考卷模式下將原 h-full 加上 print:hidden，徹底釋放高度，讓左側題目決定此題行高 */}
                           <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
