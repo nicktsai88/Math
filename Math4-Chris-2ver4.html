@@ -402,24 +402,13 @@
         return a.id - b.id;                            // 頁碼相同時，依照題號
       });
 
-      // 處理分頁邏輯：第1頁6題，第2頁起每頁8題
-      let currentGroup = "";
-      const processedQuestions = sortedQuestions.map((q) => {
+      const groupedQuestions = sortedQuestions.reduce((acc, q) => {
+        // 直接使用出處作為群組名稱，將相同出處的題目合併
         const groupName = q.source;
-        const isFirstInGroup = groupName !== currentGroup;
-        if (isFirstInGroup) currentGroup = groupName;
-        return { ...q, groupName, isFirstInGroup };
-      });
-
-      const pages = [];
-      let remaining = [...processedQuestions];
-      
-      if (remaining.length > 0) {
-        pages.push(remaining.splice(0, 6)); // 第1頁: 最多顯示 6 題
-      }
-      while (remaining.length > 0) {
-        pages.push(remaining.splice(0, 8)); // 第2頁起: 最多顯示 8 題
-      }
+        if (!acc[groupName]) acc[groupName] = [];
+        acc[groupName].push(q);
+        return acc;
+      }, {});
 
       return (
         <div className="min-h-screen font-sans print:bg-white print:py-0 py-3 md:py-6">
@@ -451,35 +440,33 @@
             </div>
           </div>
 
-          {/* 測驗卷主體 (各頁獨立容器) */}
-          <div className="w-full max-w-[98%] 2xl:max-w-[95%] mx-auto print:w-full print:max-w-full print:shadow-none print:bg-transparent print:p-0 print:m-0">
+          {/* 測驗卷主體 (螢幕顯示時最大化寬度，列印時釋放寬度填滿紙張) */}
+          <div className="w-full max-w-[98%] 2xl:max-w-[95%] mx-auto bg-white shadow-xl print:w-full print:max-w-full print:shadow-none min-h-[297mm] p-4 md:p-8 lg:p-12 print:p-0 print:m-0">
             
-            {pages.map((pageQs, pageIndex) => (
-              <div key={pageIndex} className={`bg-white shadow-xl p-4 md:p-8 lg:p-12 mb-8 print:shadow-none print:p-0 print:m-0 print:break-after-page flex flex-col ${printMode === 'exam' ? 'print:h-[279mm]' : ''}`}>
-                
-                {/* 試卷表頭 (僅在第一頁顯示) */}
-                {pageIndex === 0 && (
-                  <div className="text-center mb-8 print:mb-4 border-b-2 border-gray-800 pb-4 shrink-0">
-                    <h2 className="text-2xl font-extrabold tracking-wide text-gray-900">道明中學 國二下 數學科 段考練習</h2>
-                    <h3 className="text-xl font-bold text-gray-800 mt-2">第3章 內角與外角</h3>
-                    <div className="flex justify-between mt-6 text-lg font-medium text-gray-700">
-                      <span>錯題筆記</span>
-                      <span>姓名：<span className="font-bold text-xl tracking-widest border-b-2 border-gray-800 px-8 pb-1">蔡睿洋</span></span>
-                    </div>
-                  </div>
-                )}
+            {/* 試卷表頭 */}
+            <div className="text-center mb-8 border-b-2 border-gray-800 pb-4">
+              <h2 className="text-2xl font-extrabold tracking-wide text-gray-900">道明中學 國二下 數學科 段考練習</h2>
+              <h3 className="text-xl font-bold text-gray-800 mt-2">第3章 內角與外角</h3>
+              <div className="flex justify-between mt-6 text-lg font-medium text-gray-700">
+                <span>錯題筆記</span>
+                <span>姓名：<span className="font-bold text-xl tracking-widest border-b-2 border-gray-800 px-8 pb-1">蔡睿洋</span></span>
+              </div>
+            </div>
 
-                {/* 題目列表 (自動平均分配高度) */}
-                <div className="flex flex-col flex-1 gap-6 print:gap-0">
-                  {pageQs.map((q, index) => {
-                    const isFirst = q.isFirstInGroup;
+            {/* 題目列表 (已依據出處分組) */}
+            <div className={`flex flex-col ${printMode === 'exam' ? 'gap-6 print:gap-4' : 'gap-10 print:gap-10'}`}>
+              {Object.entries(groupedQuestions).map(([groupName, groupQs], groupIndex) => (
+                <div key={groupName} className={`flex flex-col ${printMode === 'exam' ? 'gap-4 print:gap-2' : 'gap-8 print:gap-8'} ${groupIndex > 0 && printMode !== 'exam' ? 'print:break-before-page' : ''}`}>
+                  
+                  {groupQs.map((q, index) => {
+                    const isFirst = index === 0;
                     
                     // 單一題目的內容區塊
                     const questionContent = (
-                      <div className={`flex flex-row flex-1 border-b border-gray-300 ${printMode === 'exam' ? 'py-4 print:py-2' : 'py-8 print:py-4'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
+                      <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-row border-b border-gray-300 ${printMode === 'exam' ? 'pb-4 print:pb-3' : 'pb-8 print:pb-8'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
                         
-                        {/* 左側：題目區 (寬度 65%) */}
-                        <div className="w-[65%] pr-4 md:pr-6 print:pr-3 border-r-2 border-dashed border-gray-300 flex flex-col">
+                        {/* 左側：題目區 (寬度維持 65%) */}
+                        <div className="w-[65%] pr-4 md:pr-6 print:pr-3 border-r-2 border-dashed border-gray-300">
                           {q.question && (
                             <div className="flex gap-2">
                               <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
@@ -490,7 +477,7 @@
                           
                           {/* 支援單圖或多圖顯示 (移除 pl-6 縮排，加入 w-full 最大化寬度) */}
                           {q.imageUrl && (
-                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-0.5' : 'mt-3 mb-2'} w-full flex flex-col gap-2`}>
+                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-1' : 'mt-3 mb-2'} w-full flex flex-col gap-2`}>
                               {(Array.isArray(q.imageUrl) ? q.imageUrl : [q.imageUrl]).map((img, idx) => (
                                 <img 
                                   key={idx} 
@@ -517,9 +504,9 @@
                           )}
                         </div>
 
-                        {/* 右側：解析區 (寬度 35%) */}
+                        {/* 右側：解析區 (寬度維持 35%) */}
                         <div className="w-[35%] pl-4 md:pl-6 print:pl-3 relative">
-                          {/* 考卷模式下隱藏，釋放空間 */}
+                          {/* 考卷模式下將原 h-full 加上 print:hidden，徹底釋放高度，讓左側題目決定此題行高 */}
                           <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
                             <div className="flex items-center gap-2 mb-4 text-blue-800">
                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
@@ -573,29 +560,37 @@
                       </div>
                     );
 
-                    return (
-                      <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-col ${printMode === 'exam' ? 'print:flex-1' : ''} print:break-inside-avoid`}>
-                        {/* 若是該出處的第一題，渲染出處標籤 */}
-                        {isFirst && (
-                          <div className={`flex items-center border-b-2 border-gray-400 pb-2 ${printMode === 'exam' ? 'mb-2 print:mb-1 mt-2' : 'mb-4 mt-4'} print:border-gray-800 shrink-0`}>
-                            <span className="bg-[#0000ff] text-white px-4 py-1.5 text-md font-bold rounded-t-lg tracking-widest print:bg-white print:text-[#0000ff] print:border-2 print:border-[#0000ff] print:rounded-md print:px-3">
-                              📂 出處：{q.groupName}
+                    // 若是該出處的第一題，將「出處標籤」與「第一題內容」打包成一個不可分割的區塊 (break-inside-avoid)
+                    if (isFirst) {
+                      // 由於已經統一只剩下一個標籤，預設使用藍色系
+                      let tagBgClass = 'bg-[#0000ff]';
+                      let tagTextClassPrint = 'print:text-[#0000ff]';
+                      let tagBorderClassPrint = 'print:border-[#0000ff]';
+
+                      return (
+                        <div key={`wrapper-${groupName}`} className="print:break-inside-avoid flex flex-col">
+                          {/* 出處標題標籤 */}
+                          <div className={`flex items-center border-b-2 border-gray-400 pb-2 ${printMode === 'exam' ? 'mb-2 print:mb-1' : 'mb-4'} print:border-gray-800`}>
+                            <span className={`${tagBgClass} text-white px-4 py-1.5 text-md font-bold rounded-t-lg tracking-widest print:bg-white ${tagTextClassPrint} print:border-2 ${tagBorderClassPrint} print:rounded-md print:px-3`}>
+                              📂 出處：{groupName}
                             </span>
                           </div>
-                        )}
-                        {questionContent}
-                      </div>
-                    );
+                          {questionContent}
+                        </div>
+                      );
+                    }
+
+                    // 不是第一題，就直接輸出內容
+                    return questionContent;
                   })}
                 </div>
+              ))}
+            </div>
 
-                {/* 頁尾 - 自動在每一頁的最下方標示頁碼 */}
-                <div className="mt-6 print:mt-2 text-center text-gray-400 text-sm print:block shrink-0">
-                  - 努力學習，必有收穫 - 第 {pageIndex + 1} 頁 -
-                </div>
-
-              </div>
-            ))}
+            {/* 頁尾 */}
+            <div className="mt-8 text-center text-gray-400 text-sm print:block">
+              - 努力學習，必有收穫 -
+            </div>
 
           </div>
         </div>
