@@ -476,10 +476,10 @@
                     
                     // 單一題目的內容區塊
                     const questionContent = (
-                      <div className={`flex flex-col flex-1 print:min-h-0 border-b border-gray-300 ${printMode === 'exam' ? 'py-4 print:py-2' : 'py-8 print:py-4'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
+                      <div className={`flex flex-row flex-1 print:min-h-0 border-b border-gray-300 ${printMode === 'exam' ? 'py-4 print:py-2' : 'py-8 print:py-4'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
                         
-                        {/* 上方：題目區 (寬度 100%，加入 print:min-h-0 防溢出) */}
-                        <div className="w-full flex flex-col print:min-h-0">
+                        {/* 左側：題目區 (寬度 65%，加入 print:min-h-0 防溢出) */}
+                        <div className="w-[65%] pr-4 md:pr-6 print:pr-3 border-r-2 border-dashed border-gray-300 flex flex-col print:min-h-0">
                           {q.question && (
                             <div className="flex gap-2 shrink-0">
                               <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
@@ -517,8 +517,8 @@
                           )}
                         </div>
 
-                        {/* 下方：解析區 (寬度 100%，加入 print:min-h-0) */}
-                        <div className="w-full mt-4 print:mt-3 relative print:min-h-0">
+                        {/* 右側：解析區 (寬度 35%，加入 print:min-h-0) */}
+                        <div className="w-[35%] pl-4 md:pl-6 print:pl-3 relative print:min-h-0">
                           {/* 考卷模式下隱藏，釋放空間 */}
                           <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
                             <div className="flex items-center gap-2 mb-4 text-blue-800">
