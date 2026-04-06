@@ -387,39 +387,14 @@
         }
       ];
 
-      // 將錯題依據「出處類型 -> 頁碼 -> 題號」進行排序與分組
-      const sourceRank = {
-        "數學悍將3-1": 1
-      };
-
-      const sortedQuestions = [...questions].sort((a, b) => {
-        const rankA = sourceRank[a.source] || 99;
-        const rankB = sourceRank[b.source] || 99;
-        if (rankA !== rankB) return rankA - rankB;     // 優先依照出處排序
-        
-        if (a.page !== b.page) return a.page - b.page; // 出處相同時，按照頁碼排序
-        
-        return a.id - b.id;                            // 頁碼相同時，依照題號
+      // 排序與前處理
+      const processedQuestions = [...questions].sort((a, b) => {
+        if (a.page !== b.page) return a.page - b.page;
+        return a.id - b.id;
+      }).map((q, index, arr) => {
+        const isFirstInGroup = index === 0 || q.source !== arr[index - 1].source;
+        return { ...q, groupName: q.source, isFirstInGroup };
       });
-
-      // 處理分頁邏輯：第1頁6題，第2頁起每頁7題
-      let currentGroup = "";
-      const processedQuestions = sortedQuestions.map((q) => {
-        const groupName = q.source;
-        const isFirstInGroup = groupName !== currentGroup;
-        if (isFirstInGroup) currentGroup = groupName;
-        return { ...q, groupName, isFirstInGroup };
-      });
-
-      const pages = [];
-      let remaining = [...processedQuestions];
-      
-      if (remaining.length > 0) {
-        pages.push(remaining.splice(0, 6)); // 第1頁: 最多顯示 6 題
-      }
-      while (remaining.length > 0) {
-        pages.push(remaining.splice(0, 7)); // 第2頁起: 最多顯示 7 題
-      }
 
       return (
         <div className="min-h-screen font-sans print:bg-white print:py-0 py-3 md:py-6">
@@ -451,151 +426,131 @@
             </div>
           </div>
 
-          {/* 測驗卷主體 (各頁獨立容器) */}
-          <div className="w-full max-w-[98%] 2xl:max-w-[95%] mx-auto print:w-full print:max-w-full print:shadow-none print:bg-transparent print:p-0 print:m-0">
+          {/* 測驗卷主體 */}
+          <div className="w-full max-w-[98%] 2xl:max-w-[95%] mx-auto bg-white shadow-xl print:w-full print:max-w-full print:shadow-none print:bg-transparent print:p-0 print:m-0 p-4 md:p-8 lg:p-12">
             
-            {pages.map((pageQs, pageIndex) => (
-              <div key={pageIndex} className={`bg-white shadow-xl p-4 md:p-8 lg:p-12 mb-8 print:shadow-none print:p-0 print:m-0 print:break-after-page flex flex-col`}>
-                
-                {/* 試卷表頭 (僅在第一頁顯示) */}
-                {pageIndex === 0 && (
-                  <div className="text-center mb-8 print:mb-4 border-b-2 border-gray-800 pb-4 shrink-0">
-                    <h2 className="text-2xl font-extrabold tracking-wide text-gray-900">道明中學 國二下 數學科 段考練習</h2>
-                    <h3 className="text-xl font-bold text-gray-800 mt-2">第3章 內角與外角</h3>
-                    <div className="flex justify-between mt-6 text-lg font-medium text-gray-700">
-                      <span>錯題筆記</span>
-                      <span>姓名：<span className="font-bold text-xl tracking-widest border-b-2 border-gray-800 px-8 pb-1">蔡睿洋</span></span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 題目列表 (移除強制高度分佈，讓其自然流動) */}
-                <div className="flex flex-col gap-6 print:gap-0">
-                  {pageQs.map((q, index) => {
-                    const isFirst = q.isFirstInGroup;
-                    
-                    // 單一題目的內容區塊
-                    const questionContent = (
-                      <div className={`flex flex-col border-b border-gray-300 ${printMode === 'exam' ? 'py-4 print:pt-2 print:pb-[3.5cm]' : 'py-8 print:py-4'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
-                        
-                        {/* 上方：題目區 (寬度 100%) */}
-                        <div className="w-full flex flex-col">
-                          {q.question && (
-                            <div className="flex gap-2 shrink-0">
-                              <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
-                                {q.question}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* 支援單圖或多圖顯示 (寬度100%) */}
-                          {q.imageUrl && (
-                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-0.5' : 'mt-3 mb-2'} w-full flex flex-col gap-2`}>
-                              {(Array.isArray(q.imageUrl) ? q.imageUrl : [q.imageUrl]).map((img, idx) => (
-                                <img 
-                                  key={idx} 
-                                  src={img} 
-                                  alt="題目附圖" 
-                                  className={`max-w-full rounded border border-gray-200 shadow-sm print:shadow-none print:border-gray-400 ${printMode === 'exam' ? 'w-full h-auto' : 'w-full h-auto'}`}
-                                  onError={(e) => { 
-                                    if (e.target.dataset.errorHandled) return;
-                                    e.target.dataset.errorHandled = true;
-                                    e.target.src = 'https://placehold.co/400x200?text=' + encodeURIComponent('圖片待載入'); 
-                                  }}
-                                />
-                              ))}
-                            </div>
-                          )}
-
-                          {/* 選項區塊也同步加入 shrink-0 確保文字不會被擠壓 */}
-                          {q.options && q.options.length > 0 && (
-                            <div className={`${printMode === 'exam' ? 'mt-2 print:mt-1 shrink-0' : 'mt-3'} w-full flex flex-col ${printMode === 'exam' ? 'gap-1 print:gap-0' : 'gap-2'} text-lg`}>
-                              {q.options.map((opt, idx) => (
-                                <div key={idx} className="text-gray-700">{opt}</div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* 下方：解析區 (寬度 100%) */}
-                        <div className="w-full mt-4 print:mt-3 relative">
-                          {/* 考卷模式下隱藏，釋放空間 */}
-                          <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
-                            <div className="flex items-center gap-2 mb-4 text-blue-800">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                              <span className="font-bold text-xl md:text-2xl">深度解析</span>
-                              <span className="ml-auto bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-base md:text-lg font-bold shadow-sm">
-                                解答：{q.correctAnswer}
-                              </span>
-                            </div>
-                            
-                            <div className="bg-blue-50/50 p-4 md:p-5 rounded-lg border border-blue-100">
-                              <h4 className="font-bold text-[#FF0000] text-lg md:text-xl mb-3">{q.explanation.title}</h4>
-                              
-                              {/* 解析附圖顯示區域 */}
-                              {q.explanation.imageUrl && (
-                                <div className="mb-4 pl-2 md:pl-4 border-l-4 border-amber-300">
-                                  <img 
-                                    src={q.explanation.imageUrl} 
-                                    alt="解析附圖" 
-                                    className="max-w-full w-full h-auto rounded shadow-sm border border-blue-200 print:shadow-none print:border-gray-400"
-                                    onError={(e) => { 
-                                      if (e.target.dataset.errorHandled) return;
-                                      e.target.dataset.errorHandled = true;
-                                      e.target.src = 'https://placehold.co/300x150?text=' + encodeURIComponent('解析圖片待載入'); 
-                                    }}
-                                  />
-                                </div>
-                              )}
-
-                              <p className="text-gray-800 mb-4 md:mb-5 leading-relaxed text-base md:text-lg bg-yellow-100/60 p-3 md:p-4 rounded-md whitespace-pre-wrap">
-                                <span className="font-semibold text-amber-700">💡 核心觀念：</span>
-                                {q.explanation.coreConcept}
-                              </p>
-                              
-                              <ul className="space-y-4">
-                                {q.explanation.details.map((detail, idx) => (
-                                  <li key={idx} className="text-base md:text-lg leading-relaxed whitespace-pre-wrap">
-                                    <span className={`font-semibold mr-2 ${q.correctAnswer !== "見解析" && detail.opt.includes(q.correctAnswer.substring(0,2)) ? 'text-green-700' : 'text-gray-800'}`}>
-                                      {detail.opt}
-                                    </span>
-                                    <span className="text-gray-700">
-                                      {detail.desc}
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
-                          
-                        </div>
-
-                      </div>
-                    );
-
-                    return (
-                      <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-col print:break-inside-avoid`}>
-                        {/* 若是該出處的第一題，渲染出處標籤 */}
-                        {isFirst && (
-                          <div className={`flex items-center border-b-2 border-gray-400 pb-2 ${printMode === 'exam' ? 'mb-2 print:mb-1 mt-2' : 'mb-4 mt-4'} print:border-gray-800 shrink-0`}>
-                            <span className="bg-[#0000ff] text-white px-4 py-1.5 text-md font-bold rounded-t-lg tracking-widest print:bg-white print:text-[#0000ff] print:border-2 print:border-[#0000ff] print:rounded-md print:px-3">
-                              📂 出處：{q.groupName}
-                            </span>
-                          </div>
-                        )}
-                        {questionContent}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* 頁尾 - 自動在每一頁的最下方標示頁碼 */}
-                <div className="mt-6 print:mt-2 text-center text-gray-400 text-sm print:block shrink-0">
-                  - 努力學習，必有收穫 - 第 {pageIndex + 1} 頁 -
-                </div>
-
+            {/* 試卷表頭 */}
+            <div className="text-center mb-8 print:mb-4 border-b-2 border-gray-800 pb-4 shrink-0">
+              <h2 className="text-2xl font-extrabold tracking-wide text-gray-900">道明中學 國二下 數學科 段考練習</h2>
+              <h3 className="text-xl font-bold text-gray-800 mt-2">第3章 內角與外角</h3>
+              <div className="flex justify-between mt-6 text-lg font-medium text-gray-700">
+                <span>錯題筆記</span>
+                <span>姓名：<span className="font-bold text-xl tracking-widest border-b-2 border-gray-800 px-8 pb-1">蔡睿洋</span></span>
               </div>
-            ))}
+            </div>
+
+            {/* 題目列表 (自動自然流動排版) */}
+            <div className="flex flex-col gap-6 print:gap-0">
+              {processedQuestions.map((q) => {
+                const isFirst = q.isFirstInGroup;
+                
+                // 單一題目的內容區塊
+                const questionContent = (
+                  <div className={`flex flex-col border-b border-gray-300 ${printMode === 'exam' ? 'py-4 print:pt-2 print:pb-[3.5cm]' : 'py-8 print:py-4'}`}>
+                    
+                    {/* 上方：題目區 */}
+                    <div className="w-full flex flex-col">
+                      {q.question && (
+                        <div className="flex gap-2 shrink-0">
+                          <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
+                            {q.question}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* 題目附圖 */}
+                      {q.imageUrl && (
+                        <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-0.5' : 'mt-3 mb-2'} w-full flex flex-col gap-2`}>
+                          {(Array.isArray(q.imageUrl) ? q.imageUrl : [q.imageUrl]).map((img, idx) => (
+                            <img 
+                              key={idx} 
+                              src={img} 
+                              alt="題目附圖" 
+                              className="max-w-full w-full h-auto rounded border border-gray-200 shadow-sm print:shadow-none print:border-gray-400"
+                              onError={(e) => { 
+                                if (e.target.dataset.errorHandled) return;
+                                e.target.dataset.errorHandled = true;
+                                e.target.src = 'https://placehold.co/400x200?text=' + encodeURIComponent('圖片待載入'); 
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 下方：解析區 */}
+                    <div className="w-full mt-4 print:mt-3 relative">
+                      <div className={`${printMode === 'exam' ? 'print:hidden' : ''}`}>
+                        <div className="flex items-center gap-2 mb-4 text-blue-800">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                          <span className="font-bold text-xl md:text-2xl">深度解析</span>
+                          <span className="ml-auto bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-base md:text-lg font-bold shadow-sm">
+                            解答：{q.correctAnswer}
+                          </span>
+                        </div>
+                        
+                        <div className="bg-blue-50/50 p-4 md:p-5 rounded-lg border border-blue-100">
+                          <h4 className="font-bold text-[#FF0000] text-lg md:text-xl mb-3">{q.explanation.title}</h4>
+                          
+                          {/* 解析附圖顯示區域 */}
+                          {q.explanation.imageUrl && (
+                            <div className="mb-4 pl-2 md:pl-4 border-l-4 border-amber-300">
+                              <img 
+                                src={q.explanation.imageUrl} 
+                                alt="解析附圖" 
+                                className="max-w-full w-full h-auto rounded shadow-sm border border-blue-200 print:shadow-none print:border-gray-400"
+                                onError={(e) => { 
+                                  if (e.target.dataset.errorHandled) return;
+                                  e.target.dataset.errorHandled = true;
+                                  e.target.src = 'https://placehold.co/300x150?text=' + encodeURIComponent('解析圖片待載入'); 
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          <p className="text-gray-800 mb-4 md:mb-5 leading-relaxed text-base md:text-lg bg-yellow-100/60 p-3 md:p-4 rounded-md whitespace-pre-wrap">
+                            <span className="font-semibold text-amber-700">💡 核心觀念：</span>
+                            {q.explanation.coreConcept}
+                          </p>
+                          
+                          <ul className="space-y-4">
+                            {q.explanation.details.map((detail, idx) => (
+                              <li key={idx} className="text-base md:text-lg leading-relaxed whitespace-pre-wrap">
+                                <span className={`font-semibold mr-2 ${q.correctAnswer !== "見解析" && detail.opt.includes(q.correctAnswer.substring(0,2)) ? 'text-green-700' : 'text-gray-800'}`}>
+                                  {detail.opt}
+                                </span>
+                                <span className="text-gray-700">
+                                  {detail.desc}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                );
+
+                return (
+                  <div key={`${q.source}-${q.page}-${q.id}`} className="flex flex-col print:break-inside-avoid">
+                    {isFirst && (
+                      <div className={`flex items-center border-b-2 border-gray-400 pb-2 ${printMode === 'exam' ? 'mb-2 print:mb-1 mt-2' : 'mb-4 mt-4'} print:border-gray-800 shrink-0`}>
+                        <span className="bg-[#0000ff] text-white px-4 py-1.5 text-md font-bold rounded-t-lg tracking-widest print:bg-white print:text-[#0000ff] print:border-2 print:border-[#0000ff] print:rounded-md print:px-3">
+                          📂 出處：{q.groupName}
+                        </span>
+                      </div>
+                    )}
+                    {questionContent}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 頁尾 - 將固定在整個文件最下方 (瀏覽器通常列印會自動處理頁碼) */}
+            <div className="mt-8 text-center text-gray-400 text-sm print:block shrink-0">
+              - 努力學習，必有收穫 - 
+            </div>
 
           </div>
         </div>
