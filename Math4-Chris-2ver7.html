@@ -455,7 +455,7 @@
           <div className="w-full max-w-[98%] 2xl:max-w-[95%] mx-auto print:w-full print:max-w-full print:shadow-none print:bg-transparent print:p-0 print:m-0">
             
             {pages.map((pageQs, pageIndex) => (
-              <div key={pageIndex} className={`bg-white shadow-xl p-4 md:p-8 lg:p-12 mb-8 print:shadow-none print:p-0 print:m-0 print:break-after-page flex flex-col`}>
+              <div key={pageIndex} className={`bg-white shadow-xl p-4 md:p-8 lg:p-12 mb-8 print:shadow-none print:p-0 print:m-0 print:break-after-page flex flex-col ${printMode === 'exam' ? 'print:h-[279mm]' : ''}`}>
                 
                 {/* 試卷表頭 (僅在第一頁顯示) */}
                 {pageIndex === 0 && (
@@ -469,17 +469,17 @@
                   </div>
                 )}
 
-                {/* 題目列表 (移除強制高度分佈，讓其自然流動) */}
-                <div className="flex flex-col gap-6 print:gap-0">
+                {/* 題目列表 (自動平均分配高度，加入 print:min-h-0 防溢出) */}
+                <div className="flex flex-col flex-1 gap-6 print:gap-0 print:min-h-0">
                   {pageQs.map((q, index) => {
                     const isFirst = q.isFirstInGroup;
                     
                     // 單一題目的內容區塊
                     const questionContent = (
-                      <div className={`flex flex-col border-b border-gray-300 ${printMode === 'exam' ? 'py-4 print:pt-2 print:pb-[3.5cm]' : 'py-8 print:py-4'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
+                      <div className={`flex flex-col flex-1 print:min-h-0 border-b border-gray-300 ${printMode === 'exam' ? 'py-4 print:py-2' : 'py-8 print:py-4'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
                         
-                        {/* 上方：題目區 (寬度 100%) */}
-                        <div className="w-full flex flex-col">
+                        {/* 上方：題目區 (寬度 100%，加入 print:min-h-0 防溢出) */}
+                        <div className="w-full flex flex-col print:min-h-0">
                           {q.question && (
                             <div className="flex gap-2 shrink-0">
                               <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
@@ -488,15 +488,15 @@
                             </div>
                           )}
                           
-                          {/* 支援單圖或多圖顯示 (寬度100%) */}
+                          {/* 支援單圖或多圖顯示 (加入 print:flex-1 print:min-h-0 讓圖片容器可縮小，並設定 object-contain 確保圖片不重疊) */}
                           {q.imageUrl && (
-                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-0.5' : 'mt-3 mb-2'} w-full flex flex-col gap-2`}>
+                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-0.5 print:flex-1 print:min-h-0' : 'mt-3 mb-2'} w-full flex flex-col gap-2`}>
                               {(Array.isArray(q.imageUrl) ? q.imageUrl : [q.imageUrl]).map((img, idx) => (
                                 <img 
                                   key={idx} 
                                   src={img} 
                                   alt="題目附圖" 
-                                  className={`max-w-full rounded border border-gray-200 shadow-sm print:shadow-none print:border-gray-400 ${printMode === 'exam' ? 'w-full h-auto' : 'w-full h-auto'}`}
+                                  className={`max-w-full rounded border border-gray-200 shadow-sm print:shadow-none print:border-gray-400 ${printMode === 'exam' ? 'w-full h-auto print:h-full print:w-full print:object-contain print:object-left-top' : 'w-full h-auto'}`}
                                   onError={(e) => { 
                                     if (e.target.dataset.errorHandled) return;
                                     e.target.dataset.errorHandled = true;
@@ -517,8 +517,8 @@
                           )}
                         </div>
 
-                        {/* 下方：解析區 (寬度 100%) */}
-                        <div className="w-full mt-4 print:mt-3 relative">
+                        {/* 下方：解析區 (寬度 100%，加入 print:min-h-0) */}
+                        <div className="w-full mt-4 print:mt-3 relative print:min-h-0">
                           {/* 考卷模式下隱藏，釋放空間 */}
                           <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
                             <div className="flex items-center gap-2 mb-4 text-blue-800">
@@ -574,7 +574,7 @@
                     );
 
                     return (
-                      <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-col print:break-inside-avoid`}>
+                      <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-col ${printMode === 'exam' ? 'print:flex-1 print:min-h-0' : ''} print:break-inside-avoid`}>
                         {/* 若是該出處的第一題，渲染出處標籤 */}
                         {isFirst && (
                           <div className={`flex items-center border-b-2 border-gray-400 pb-2 ${printMode === 'exam' ? 'mb-2 print:mb-1 mt-2' : 'mb-4 mt-4'} print:border-gray-800 shrink-0`}>
