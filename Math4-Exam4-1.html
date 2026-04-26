@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第二次段考總複習 數學錯題本</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 React 與 ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- 引入 Babel 供瀏覽器直接解析 JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- 列印專屬的 CSS 設定 -->
+  <style>
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 15mm;
+      }
+      body {
+        background-color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const MistakeNotebook = () => {
+      const [printMode, setPrintMode] = useState('solution'); // 'exam' or 'solution'
+
+      const handlePrint = (mode) => {
+        setPrintMode(mode);
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      };
+
+      const questions = [
+        // ==================== 選擇題 (10題) ====================
+        {
+          id: 1,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 1,
+          topic: "多邊形內外角應用",
+          question: "如圖,將正五邊形和正六邊形的一邊皆緊靠著直線L,其中有一角剛好靠在一起,則下列何者錯誤?",
+          imageUrl: "Math4-Exam4-1-images/p1.jpg",
+          options: [
+            "(A) ∠3 > ∠4",
+            "(B) ∠2 = 48°",
+            "(C) ∠1 = 84°",
+            "(D) ∠1 = 48°"
+          ],
+          correctAnswer: "C",
+          explanation: {
+            title: "【正多邊形外角與對頂角】",
+            coreConcept: "正 n 邊形的外角為 360°/n。底部的小三角形內角和為 180°，頂點的交叉角為對頂角。",
+            details: [
+              { opt: "Step 1", desc: "∠3 是正五邊形的外角，所以 ∠3 = 360° ÷ 5 = 72°。" },
+              { opt: "Step 2", desc: "∠4 是正六邊形的外角，所以 ∠4 = 360° ÷ 6 = 60°。由此可知 (A) ∠3 > ∠4 是正確的。" },
+              { opt: "Step 3", desc: "在底部的小三角形中，三個內角和為 180°。所以 ∠2 = 180° - 72° - 60° = 48°。故 (B) 正確。" },
+              { opt: "Step 4", desc: "因為 ∠1 與 ∠2 是對頂角，所以 ∠1 = ∠2 = 48°。故 (D) 正確，而 (C) 錯誤。" }
+            ]
+          }
+        },
+        {
+          id: 2,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 1,
+          topic: "三角形外角與角度推導",
+          question: "如圖,兩個三角板重疊,∠ABC=∠EDB=90°,線段DE = 線段DB,∠DBC=25°,∠C=30°,求 ∠EFD=?",
+          imageUrl: "Math4-Exam4-1-images/p2.jpg",
+          options: [
+            "(A) 100°",
+            "(B) 105°",
+            "(C) 110°",
+            "(D) 115°"
+          ],
+          correctAnswer: "D",
+          explanation: {
+            title: "【等腰直角三角形與外角定理】",
+            coreConcept: "利用等腰直角三角形的 45° 特性，找出目標三角形的內角，再利用外角定理求解。",
+            details: [
+              { opt: "Step 1", desc: "△EDB 中，∠EDB = 90° 且 DE = DB，所以這是一個等腰直角三角形。底角 ∠E = ∠EBD = 45°。" },
+              { opt: "Step 2", desc: "觀察 F 點是線段 ED 與 BC 的交點。我們把焦點放在 △FBD 身上。" },
+              { opt: "Step 3", desc: "在 △FBD 中，已知 ∠FDB = 90° (即 ∠EDB)，且已知 ∠FBD = 25° (即 ∠DBC)。" },
+              { opt: "Step 4", desc: "∠EFD 是 △FBD 在 F 點的外角。根據外角定理：外角 = 兩個內對角之和。所以 ∠EFD = ∠FDB + ∠FBD = 90° + 25° = 115°。" }
+            ]
+          }
+        },
+        {
+          id: 3,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 1,
+          topic: "內外角平分線夾角定理",
+          question: "如圖, ∠CAB 與 ∠CBA 的角平分線相交於D點,而 ∠CAB 和 ∠CBE(外角) 的角平分線相交於P點,若 ∠ADB=150°,則 ∠C+∠P=?",
+          imageUrl: "Math4-Exam4-1-images/p3.jpg",
+          options: [
+            "(A) 120°",
+            "(B) 150°",
+            "(C) 160°",
+            "(D) 180°"
+          ],
+          correctAnswer: "D",
+          explanation: {
+            title: "【內心與旁心的夾角公式】",
+            coreConcept: "兩內角平分線夾角 = 90° + (第三角/2)；一內角一外角平分線夾角 = 第三角/2。",
+            details: [
+              { opt: "Step 1", desc: "D 點為 △ABC 的內心，根據公式：∠ADB = 90° + (∠C / 2)。" },
+              { opt: "Step 2", desc: "代入已知條件：150° = 90° + (∠C / 2)，推得 (∠C / 2) = 60°，故 ∠C = 120°。" },
+              { opt: "Step 3", desc: "P 點為 △ABC 的一個旁心(一內角一外角平分線交點)，根據公式：∠P = ∠C / 2。" },
+              { opt: "Step 4", desc: "因此 ∠P = 120° / 2 = 60°。最後所求 ∠C + ∠P = 120° + 60° = 180°。" }
+            ]
+          }
+        },
+        {
+          id: 4,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 1,
+          topic: "飛鏢模型與外角和",
+          question: "如圖,若 ∠E=30°,則 ∠A+∠B+∠C+∠D=?",
+          imageUrl: "Math4-Exam4-1-images/p4.jpg",
+          options: [
+            "(A) 180°",
+            "(B) 210°",
+            "(C) 240°",
+            "(D) 270°"
+          ],
+          correctAnswer: "B",
+          explanation: {
+            title: "【漏斗/飛鏢圖形的角度轉換】",
+            coreConcept: "將多個角度透過三角形內角和與對頂角的概念，集中轉移到同一個多邊形內計算。",
+            details: [
+              { opt: "Step 1", desc: "觀察圖形中央交錯構成的四邊形。根據圖形特性，這類由兩個三角形延伸構成的圖形，其頂角總和有固定的關係。" },
+              { opt: "Step 2", desc: "我們可以用三角形外角或內角和來推導：左側三角形的兩個底角和為 180° - ∠A - ∠C；右側為 180° - ∠B - ∠D。" },
+              { opt: "Step 3", desc: "更快的解法是套用星形或蝴蝶形推廣公式：∠A + ∠B + ∠C + ∠D = 180° + ∠E。" },
+              { opt: "Step 4", desc: "代入 ∠E = 30°，可得 ∠A + ∠B + ∠C + ∠D = 180° + 30° = 210°。" }
+            ]
+          }
+        },
+        {
+          id: 5,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 1,
+          topic: "全等三角形的旋轉模型",
+          question: "如圖, △ABC 和 △ADE 皆為正三角形,若 ∠1=55°,則 ∠ABD=?",
+          imageUrl: "Math4-Exam4-1-images/p5.jpg",
+          options: [
+            "(A) 115°",
+            "(B) 110°",
+            "(C) 105°",
+            "(D) 100°"
+          ],
+          correctAnswer: "A",
+          explanation: {
+            title: "【共頂點正三角形的 SAS 全等】",
+            coreConcept: "兩個正三角形共用一個頂點時，旋轉一個角度必然會產生一組 SAS 全等三角形。",
+            details: [
+              { opt: "Step 1", desc: "因為 △ABC 與 △ADE 皆為正三角形，所以 AB = AC，AD = AE，且 ∠BAC = ∠DAE = 60°。" },
+              { opt: "Step 2", desc: "觀察 ∠BAD 與 ∠CAE：∠BAD = 60° - ∠DAC，而 ∠CAE = 60° - ∠DAC。因此 ∠BAD = ∠CAE。" },
+              { opt: "Step 3", desc: "在 △ABD 與 △ACE 中，具備 AB=AC, ∠BAD=∠CAE, AD=AE，故 △ABD ≅ △ACE (SAS全等)。" },
+              { opt: "Step 4", desc: "由全等可知 ∠ABD = ∠ACE。從圖形得知 ∠ACE = ∠ACB + ∠BCE = 60° + 55°(即題目中的∠1) = 115°。故 ∠ABD = 115°。" }
+            ]
+          }
+        },
+        {
+          id: 6,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 2,
+          topic: "星形多邊形內角和",
+          question: "輸輸替班上設計了一個象徵幸運的七角星班級徽章,則此幸運星的七個角度的和為多少? (即 ∠1+∠2+∠3+∠4+∠5+∠6+∠7=?)",
+          imageUrl: "Math4-Exam4-1-images/p6.jpg",
+          options: [
+            "(A) 150°",
+            "(B) 180°",
+            "(C) 240°",
+            "(D) 無法求得"
+          ],
+          correctAnswer: "B",
+          explanation: {
+            title: "【連續星形頂角和公式】",
+            coreConcept: "一筆畫到底的 n 角星，其頂點內角和公式為 (n - 2k) × 180°，其中 k 為跨越的頂點數。",
+            details: [
+              { opt: "圖形判斷", desc: "這是一個標準的尖銳七角星(跨越2個點連線，符號為 {7/3})。我們也可以透過三角形外角定理，將七個角全部推移到同一個三角形內。" },
+              { opt: "公式解法", desc: "最快的記憶法：像這種一筆畫成、最尖銳的奇數角星形（如五角星、七角星），其所有頂角的總和永遠都是 180°。" }
+            ]
+          }
+        },
+        {
+          id: 7,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 2,
+          topic: "多邊形內角與等差數列",
+          question: "已知五邊形的5個內角度數成等差數列,若最大角為146°,求最小角的度數為幾度?",
+          options: [
+            "(A) 60°",
+            "(B) 68°",
+            "(C) 70°",
+            "(D) 76°"
+          ],
+          correctAnswer: "C",
+          explanation: {
+            title: "【等差中項與內角和公式】",
+            coreConcept: "五邊形內角和為 540°。成等差數列的奇數項，其總和 = 中間項 × 項數。",
+            details: [
+              { opt: "Step 1", desc: "五邊形的內角和 = (5 - 2) × 180° = 540°。" },
+              { opt: "Step 2", desc: "因為五個角成等差數列，所以「平均數 = 等差中項(第3大角)」。等差中項 = 540° ÷ 5 = 108°。" },
+              { opt: "Step 3", desc: "設公差為 d。五個角依序為：108°-2d, 108°-d, 108°, 108°+d, 108°+2d。" },
+              { opt: "Step 4", desc: "已知最大角 = 108° + 2d = 146°，解得 2d = 38°。所求最小角 = 108° - 2d = 108° - 38° = 70°。" }
+            ]
+          }
+        },
+        {
+          id: 8,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 2,
+          topic: "正方形外的全等三角形",
+          question: "如圖,ABCD 為正方形,BE⊥L, DF⊥L, 若線段BE=6, 線段DF=8, 線段DE=?",
+          imageUrl: "Math4-Exam4-1-images/p7.jpg",
+          options: [
+            "(A) 10",
+            "(B) 14",
+            "(C) √65",
+            "(D) 2√58"
+          ],
+          correctAnswer: "C",
+          explanation: {
+            title: "【正方形經典 AAS 全等證明】",
+            coreConcept: "正方形頂點落在直線上時，兩側向直線作垂線，必定產生一組 AAS 全等的直角三角形。",
+            details: [
+              { opt: "Step 1", desc: "在 △BCE 與 △CDF 中：∠E = ∠F = 90°；因為正方形 BC = CD。" },
+              { opt: "Step 2", desc: "角度轉換：∠BCE + ∠DCF = 90°，而 △BCE 中 ∠EBC + ∠BCE = 90°，所以 ∠EBC = ∠DCF。故 △BCE ≅ △CDF (AAS全等)。" },
+              { opt: "Step 3", desc: "由全等對應邊相等可知：CE = DF = 8，且 CF = BE = 6。因此底邊總長 EF = CE + CF = 8 + 6 = 14。" },
+              { opt: "Step 4", desc: "最後在直角 △DFE 中，利用畢氏定理求 DE：DE = √(DF² + EF²) = √(8² + 14²) = √(64 + 196) = √260 = 2√65。" }
+            ]
+          }
+        },
+        {
+          id: 9,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 2,
+          topic: "多邊形內角平分線",
+          question: "如圖, ∠1=∠2, ∠3=∠4, ∠B=98°, ∠A=86°, ∠E=140°, 則 ∠CFD=?",
+          imageUrl: "Math4-Exam4-1-images/p8.jpg",
+          options: [
+            "(A) 72°",
+            "(B) 74°",
+            "(C) 76°",
+            "(D) 78°"
+          ],
+          correctAnswer: "A",
+          explanation: {
+            title: "【五邊形內角和與角平分線】",
+            coreConcept: "先利用多邊形內角和求出剩餘兩大角的總和，再除以 2 放入小三角形內計算。",
+            details: [
+              { opt: "Step 1", desc: "五邊形 ABCDE 內角和 = (5 - 2) × 180° = 540°。" },
+              { opt: "Step 2", desc: "扣除已知的三個角，求出 ∠C 與 ∠D 的總和：∠C + ∠D = 540° - 86° - 98° - 140° = 216°。" },
+              { opt: "Step 3", desc: "F 點為 ∠C 與 ∠D 角平分線的交點。在 △FCD 中，底角 ∠FCD + ∠FDC = (∠C + ∠D) / 2 = 216° / 2 = 108°。" },
+              { opt: "Step 4", desc: "最後利用三角形內角和求頂角：∠CFD = 180° - 108° = 72°。" }
+            ]
+          }
+        },
+        {
+          id: 10,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 2,
+          topic: "等腰三角形的底角推導",
+          question: "如圖, △ABC 中, ∠ACB=102°, 線段AF = AC、線段BE = BC, 求 ∠ECF=?",
+          imageUrl: "Math4-Exam4-1-images/p9.jpg",
+          options: [
+            "(A) 34°",
+            "(B) 39°",
+            "(C) 45°",
+            "(D) 56°"
+          ],
+          correctAnswer: "B",
+          explanation: {
+            title: "【等腰三角形底角的代數轉換】",
+            coreConcept: "雖然不知道 ∠A 和 ∠B 各自是多少，但我們知道把它們綁在一起的總和(x+y)，藉此可求出答案。",
+            details: [
+              { opt: "Step 1", desc: "設 ∠A = x，∠B = y。因為 △ABC 內角和為 180°，所以 x + y = 180° - 102° = 78°。" },
+              { opt: "Step 2", desc: "△AFC 為等腰(AF=AC)，其底角 ∠ACF = (180° - x) / 2 = 90° - (x/2)。" },
+              { opt: "Step 3", desc: "△BEC 為等腰(BE=BC)，其底角 ∠BCE = (180° - y) / 2 = 90° - (y/2)。" },
+              { opt: "Step 4", desc: "從圖中觀察角度重疊的關係：∠ECF = ∠ACF + ∠BCE - ∠ACB。代入得：[90° - (x/2)] + [90° - (y/2)] - 102° = 180° - (x+y)/2 - 102°。因為 x+y = 78°，(x+y)/2 = 39°。故 ∠ECF = 180° - 39° - 102° = 39°。" }
+            ]
+          }
+        },
+        // ==================== 填充題 (15題) ====================
+        {
+          id: 11,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 3,
+          topic: "SSA 判別與鈍角三角形",
+          question: "在 △ABC 與 △DEF 中,若 線段AB=DE, 線段AC=DF, ∠B=∠E, ∠C=65°,則:\n(1) 若 △ABC ≅ △DEF, 則 ∠F=____度。\n(2) 若 △ABC 與 △DEF 不全等, 則 ∠F=____度。",
+          options: [],
+          correctAnswer: "(1) 65 (2) 115",
+          explanation: {
+            title: "【SSA 的兩種可能性】",
+            coreConcept: "SSA (兩邊一對角) 不能保證必定全等，第三個角可能會出現「相等」或是「互補」兩種情況。",
+            details: [
+              { opt: "情況一", desc: "若兩三角形全等，則對應角相等，所以 ∠F = ∠C = 65°。" },
+              { opt: "情況二", desc: "這就是 SSA 的盲點「擺盪的第三邊」。如果兩者不全等，則第三角必然互補，因此 ∠F = 180° - 65° = 115°。" }
+            ]
+          }
+        },
+        {
+          id: 12,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 3,
+          topic: "多邊形外角和應用",
+          question: "如圖,求 ∠1+∠2+∠3+∠4+∠5+∠6+∠7=____度。",
+          imageUrl: "Math4-Exam4-1-images/p10.jpg",
+          options: [],
+          correctAnswer: "360",
+          explanation: {
+            title: "【任意多邊形外角和恆定】",
+            coreConcept: "不論是幾邊形，只要是凸多邊形，其外角和永遠等於 360°。",
+            details: [
+              { opt: "觀察圖形", desc: "這七個角剛好是中間這個七邊形向外延伸所形成的「一組外角」。" },
+              { opt: "定理應用", desc: "根據多邊形外角和定理，不論 n 為多少，一組外角和恆為 360°。" }
+            ]
+          }
+        },
+        {
+          id: 13,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 3,
+          topic: "正方形外的直角三角形全等",
+          question: "如圖,一個邊長5公分的正方盒子斜靠在垂直的牆上,R點距離牆面4公分,則P點在地板以上的高度為____公分。",
+          imageUrl: "Math4-Exam4-1-images/p11.jpg",
+          options: [],
+          correctAnswer: "7",
+          explanation: {
+            title: "【座標法與直角全等】",
+            coreConcept: "利用正方形外側的 AAS 全等直角三角形，將斜向距離轉化為水平與垂直的投影長度。",
+            details: [
+              { opt: "Step 1", desc: "設牆角為原點 O(0,0)。R 點在地板上距離牆面 4，故 R(4,0)。Q 點在牆面上，正方形邊長 QR=5。在直角 △QOR 中，利用畢氏定理求出 OQ = √(5² - 4²) = 3。所以 Q(0,3)。" },
+              { opt: "Step 2", desc: "從 P 點向牆面作垂線。你會發現上方產生的直角三角形會與下方的 △QOR 全等 (AAS)。" },
+              { opt: "Step 3", desc: "全等使得原本的底邊 4 變成了上方的垂直高度，原本的垂直高度 3 變成了上方的水平寬度。" },
+              { opt: "Step 4", desc: "P 點的高度 = Q 點的高度 + 新的垂直高度 = 3 + 4 = 7 公分。" }
+            ]
+          }
+        },
+        {
+          id: 14,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 3,
+          topic: "正方形內部的全等證明",
+          question: "如圖,四邊形ABCD為正方形,已知 線段AE=BF,試說明 ∠AGF=90°",
+          imageUrl: "Math4-Exam4-1-images/p12.jpg",
+          options: [],
+          correctAnswer: "見解析",
+          explanation: {
+            title: "【RHS 全等與直角轉移】",
+            coreConcept: "證明全等後，利用對應角相等替換三角形內角的組成，證明目標角為 90°。",
+            details: [
+              { opt: "證明步驟 1", desc: "在 △ABE 與 △BCF 中：\n(1) AE = BF (已知)\n(2) ∠ABE = ∠BCF = 90° (正方形內角)\n(3) AB = BC (正方形邊長)\n因此 △ABE ≅ △BCF (RHS 全等性質)。" },
+              { opt: "證明步驟 2", desc: "由全等對應角可知：∠BAE = ∠CBF。" },
+              { opt: "證明步驟 3", desc: "在 △ABG 中，內角和 ∠AGB = 180° - (∠BAE + ∠ABG)。\n將剛才的 ∠BAE 替換成 ∠CBF，式子變成 180° - (∠CBF + ∠ABG)。" },
+              { opt: "結論", desc: "因為 ∠CBF + ∠ABG 剛好就是正方形的一個直角 ∠ABC = 90°。所以 ∠AGB = 180° - 90° = 90°。對頂角 ∠AGF 也就等於 90°。" }
+            ]
+          }
+        },
+        {
+          id: 15,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 3,
+          topic: "鈍角三角形的 SSA 特例",
+          question: "在 △ABC 與 △DEF 中,若 線段AB=DE, 線段BC=EF, ∠A=∠D=110°, ∠C=20°,則 ∠F=____度。",
+          imageUrl: "Math4-Exam4-1-images/p13.jpg",
+          options: [],
+          correctAnswer: "20",
+          explanation: {
+            title: "【SSA 的鈍角唯一性】",
+            coreConcept: "SSA 一般不能保證全等，但如果給定的角是「鈍角」或「直角(即 RHS)」，則三角形必然全等。",
+            details: [
+              { opt: "觀念突破", desc: "已知兩邊與一對角 (SSA)。因為已知的對角 ∠A = 110° 是鈍角，在三角形中鈍角只能有一個，不會有「擺盪」產生兩種三角形的情況。" },
+              { opt: "計算", desc: "既然形狀唯一確定，△ABC 必然全等於 △DEF。故對應角 ∠F = ∠C = 20°。" }
+            ]
+          }
+        },
+        {
+          id: 16,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 4,
+          topic: "全等三角形的面積推移",
+          question: "如圖,已知B、C、F三點共線,E為CD中點, ∠BCD+∠D=180°。若 △ADE 面積是四邊形ABCD面積的 1/5，若 △ADE 面積為12，則 △ABF 面積為____平方單位。",
+          imageUrl: "Math4-Exam4-1-images/p14.jpg",
+          options: [],
+          correctAnswer: "60",
+          explanation: {
+            title: "【ASA全等與面積拼圖】",
+            coreConcept: "透過證明上下兩個小三角形全等，將原本四邊形的面積「剪下貼上」，轉換為一個大三角形的面積。",
+            details: [
+              { opt: "Step 1 (證明全等)", desc: "已知 ∠BCD+∠D=180°，且 ∠BCD+∠ECF=180° (平角)，所以 ∠D = ∠ECF。加上 E 為中點 (DE=CE) 以及對頂角 ∠AED = ∠FEC。故 △ADE ≅ △FCE (ASA)。" },
+              { opt: "Step 2 (面積計算)", desc: "因為全等，所以 △ADE 面積 = △FCE 面積 = 12。" },
+              { opt: "Step 3 (面積轉移)", desc: "四邊形 ABCD 面積 = △ADE面積 × 5 = 12 × 5 = 60。" },
+              { opt: "Step 4 (求目標面積)", desc: "大三角形 △ABF 面積 = 四邊形 ABCE 面積 + △FCE 面積 = 四邊形 ABCE 面積 + △ADE 面積 = 就是原本的四邊形 ABCD 面積 = 60。" }
+            ]
+          }
+        },
+        {
+          id: 17,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 4,
+          topic: "畢氏定理與餘弦組合",
+          question: "如圖, △PQR 為直角三角形,而四邊形 QABR和四邊形PRCD 分別是以QR和PR為邊所作的正方形。若 線段PR=25, 線段QR=24, 則 線段CQ=____。",
+          imageUrl: "Math4-Exam4-1-images/p15.jpg",
+          options: [],
+          correctAnswer: "√1537",
+          explanation: {
+            title: "【商高定理與外側正方形距離】",
+            coreConcept: "確認直角的位置後，利用餘弦定理或座標幾何來計算跨越三角形與正方形的長度。",
+            details: [
+              { opt: "Step 1", desc: "在 △PQR 中，已知 PR=25, QR=24。若這是直角三角形，唯一的可能是 PR 為斜邊，所以 PQ = √(25² - 24²) = 7。且直角在 Q (∠PQR = 90°)。" },
+              { opt: "Step 2 (座標幾何法)", desc: "將 Q 放在原點 (0,0)。R 點在 (24,0)，P 點在 (0,7)。" },
+              { opt: "Step 3", desc: "正方形 PRCD 建構在 PR 上。向量 RP = (-24, 7)。正方形通常朝外側作圖，將 RP 逆時針旋轉 90° 得到向量 RC = (7, 24)。" },
+              { opt: "Step 4", desc: "C 點座標 = R 點座標 + RC 向量 = (24,0) + (7,24) = (31, 24)。" },
+              { opt: "Step 5", desc: "計算 CQ 距離 = √(31² + 24²) = √(961 + 576) = √1537。" }
+            ]
+          }
+        },
+        {
+          id: 18,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 4,
+          topic: "三角形外角綜合計算",
+          question: "求附圖中三種情境的x、y之值:\n(1) 左圖: x=____\n(2) 中圖: y=____\n(3) 右圖: x=____, y=____",
+          imageUrl: "Math4-Exam4-1-images/p16.jpg",
+          options: [],
+          correctAnswer: "(1) x=57 (2) x=49, y=131 (3) x=38, y=57",
+          explanation: {
+            title: "【三角形內外角基本功】",
+            coreConcept: "反覆利用「內角和 180°」與「外角等於兩內對角和」列出方程式解未知數。",
+            details: [
+              { opt: "(1) 解析", desc: "這是一個簡單的三角形，已知兩角為 58° 與 65°。x = 180° - 58° - 65° = 57。" },
+              { opt: "(2) 解析", desc: "圖中顯示外角等於兩內對角和。第一個關係：2x = 98 (推測圖形列式為 x + (x+82) = 180，則 2x = 98，x = 49)。第二個關係：y 為外角 = 49 + 82 = 131。" },
+              { opt: "(3) 解析", desc: "圖中交叉兩個三角形。左側：2x = 180 - 38 - 66 = 76，解得 x = 38。右側：2y + 66 = 180，解得 2y = 114，y = 57。" }
+            ]
+          }
+        },
+        {
+          id: 19,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 5,
+          topic: "全等多項式解聯立",
+          question: "若 △ABC ≅ △DEF, A 的對應頂點D, B的對應頂點E。已知 AB = 2x+5, AC = x+8, DE = 3y-2, DF = y+7, BC = 16。\n(1) x+y=____。\n(2) △DEF 周長為____。",
+          options: [],
+          correctAnswer: "(1) 9 (2) 41",
+          explanation: {
+            title: "【對應邊相等列聯立方程式】",
+            coreConcept: "全等三角形對應邊長必相等。依此建立 x 與 y 的二元一次聯立方程式。",
+            details: [
+              { opt: "Step 1", desc: "對應邊 AB = DE，列式：2x + 5 = 3y - 2 ⟹ 2x - 3y = -7。" },
+              { opt: "Step 2", desc: "對應邊 AC = DF，列式：x + 8 = y + 7 ⟹ x - y = -1 ⟹ x = y - 1。" },
+              { opt: "Step 3", desc: "代入第一式：2(y - 1) - 3y = -7 ⟹ 2y - 2 - 3y = -7 ⟹ -y = -5 ⟹ y = 5。推得 x = 4。" },
+              { opt: "Step 4", desc: "(1) x + y = 4 + 5 = 9。" },
+              { opt: "Step 5", desc: "(2) 計算各邊長：AB = 2(4)+5 = 13，AC = 4+8 = 12，BC = 16。周長 = 13 + 12 + 16 = 41。(註：原卷筆記寫 40 是加錯了，正解為 41)。" }
+            ]
+          }
+        },
+        {
+          id: 20,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 5,
+          topic: "複雜等腰三角形角度推導",
+          question: "△ABC 中, 線段AB=AC, 已知 ∠ACB=54°, D在BC上, 且 ∠BAC=3∠BAD, ∠EAD=∠CAD, 且 AE = AC, 則:\n(1) ∠EAB=____度。\n(2) ∠ECB=____度。",
+          imageUrl: "Math4-Exam4-1-images/p17.jpg",
+          options: [],
+          correctAnswer: "(1) 24 (2) 12",
+          explanation: {
+            title: "【角度分配與等腰三角形連鎖】",
+            coreConcept: "先求出大頂角，依比例分配角度。接著利用新產生的一堆等腰三角形(AB=AC=AE)求底角。",
+            details: [
+              { opt: "Step 1", desc: "在等腰 △ABC 中，∠B = ∠C = 54°。頂角 ∠BAC = 180° - 2(54°) = 72°。" },
+              { opt: "Step 2", desc: "已知 ∠BAC = 3∠BAD，所以 72° = 3∠BAD ⟹ ∠BAD = 24°。剩下的 ∠DAC = 72° - 24° = 48°。" },
+              { opt: "Step 3", desc: "已知 ∠EAD = ∠CAD = 48°。向外側畫 E 點，則 ∠EAB = ∠EAD - ∠BAD = 48° - 24° = 24°。完成第 (1) 題。" },
+              { opt: "Step 4", desc: "因為 AE=AC 且 AB=AC，所以 AE=AC=AB。在等腰 △AEC 中，頂角 ∠EAC = 48° + 48° = 96°。底角 ∠ACE = (180° - 96°) / 2 = 42°。" },
+              { opt: "Step 5", desc: "最後看 C 點周圍的夾角：∠ECB = ∠ACB(54°) - ∠ACE(42°) = 12°。完成第 (2) 題。" }
+            ]
+          }
+        },
+        {
+          id: 21,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 5,
+          topic: "六角星內角和",
+          question: "如圖,求 ∠1+∠2+∠3+∠4+∠5+∠6=____度。",
+          imageUrl: "Math4-Exam4-1-images/p18.jpg",
+          options: [],
+          correctAnswer: "360",
+          explanation: {
+            title: "【雙三角形構成的六角星】",
+            coreConcept: "由兩個三角形疊合而成的六角星（大衛之星），其尖端六個角的總和就是兩個三角形內角和的加總。",
+            details: [
+              { opt: "邏輯推演", desc: "這個圖形是由一個正向三角形與一個倒向三角形所組成。" },
+              { opt: "計算", desc: "一個三角形的內角和是 180°，兩個三角形加起來就是 180° × 2 = 360°。" }
+            ]
+          }
+        },
+        {
+          id: 22,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 5,
+          topic: "四邊形內角和方程式",
+          question: "四邊形ABCD中,若 ∠A+∠B=155°, ∠B+∠C=165°, ∠C+∠D=205°, 則 ∠A+∠D=____度。",
+          options: [],
+          correctAnswer: "195",
+          explanation: {
+            title: "【內角和 360° 的恆等替換】",
+            coreConcept: "無論給出什麼複雜的組合，四邊形四個內角的總和永遠是 360°，利用這點即可輕鬆替換。",
+            details: [
+              { opt: "Step 1", desc: "四邊形內角和恆等式：∠A + ∠B + ∠C + ∠D = 360°。" },
+              { opt: "Step 2", desc: "題目給了 ∠B + ∠C = 165°，我們將它整體代入上方的恆等式中。" },
+              { opt: "Step 3", desc: "變成 ∠A + (165°) + ∠D = 360°。" },
+              { opt: "Step 4", desc: "移項求解：∠A + ∠D = 360° - 165° = 195°。" }
+            ]
+          }
+        },
+        {
+          id: 23,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 5,
+          topic: "延伸星形多邊形角度和",
+          question: "若 ∠1=100°,則 ∠A+∠B+∠C+∠D+∠E+∠F+∠G+∠H=____度。",
+          imageUrl: "Math4-Exam4-1-images/p19.jpg",
+          options: [],
+          correctAnswer: "460",
+          explanation: {
+            title: "【內部多邊形與尖角轉換】",
+            coreConcept: "尖角的總和 = (附著的三角形數量 × 180°) - 這些三角形消耗掉的底角總和。",
+            details: [
+              { opt: "Step 1", desc: "觀察圖形中央是一個五邊形。五邊形的內角和為 540°。" },
+              { opt: "Step 2", desc: "這 8 個頂角(A~H)來自於 4 個附著在五邊形邊上的三角形。這 4 個三角形的所有內角總和原本應該是 4 × 180° = 720°。" },
+              { opt: "Step 3", desc: "這 4 個三角形的底角，剛好是五邊形四個頂點的外角(共8個底角，分別是4個頂點的兩側外角)。" },
+              { opt: "Step 4", desc: "利用公式推導的捷徑結論：這類星形尖角總和 = 中央多邊形內角和 - 缺口處的那個外角。 540° - (180° - 100°) = 540° - 80° = 460°。" }
+            ]
+          }
+        },
+        {
+          id: 24,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 6,
+          topic: "中垂線與解析幾何",
+          question: "長方形ABCD中, 線段AB=3, 線段BC=4, 且L為 線段AC 的垂直平分線, 則 線段PD=____",
+          imageUrl: "Math4-Exam4-1-images/p20.jpg",
+          options: [],
+          correctAnswer: "7/8",
+          explanation: {
+            title: "【坐標平面法降維打擊】",
+            coreConcept: "遇到長方形與垂直平分線的交點問題，將圖形放入 x-y 坐標系求直線方程式是最穩定不易錯的方法。",
+            details: [
+              { opt: "Step 1", desc: "將 B 放在原點(0,0)。那麼 C(4,0)，A(0,3)，D(4,3)。" },
+              { opt: "Step 2", desc: "AC 線段的中點座標為 (2, 1.5)。AC 的斜率 m = (0 - 3) / (4 - 0) = -3/4。" },
+              { opt: "Step 3", desc: "中垂線 L 垂直於 AC，所以 L 的斜率為其負倒數 4/3。L 的直線方程式為：y - 1.5 = (4/3)(x - 2)。" },
+              { opt: "Step 4", desc: "P 點位在 AD 邊上，也就是 y=3 的水平線上。代入 y=3 解 x：1.5 = (4/3)(x - 2) ⟹ x - 2 = 9/8 ⟹ x = 25/8。" },
+              { opt: "Step 5", desc: "P(25/8, 3)，D(4, 3)。所以 PD 距離 = 4 - 25/8 = 32/8 - 25/8 = 7/8。" }
+            ]
+          }
+        },
+        {
+          id: 25,
+          source: "第二次段考總複習(CH3-1~3-4)",
+          page: 6,
+          topic: "圖形的旋轉變換",
+          question: "如圖,將 △PQR 以R為定點,按順時針的方向旋轉60°,使P點落在S點,使Q點落在T點,則 △PRS 為____三角形,且 ∠1=____度。",
+          imageUrl: "Math4-Exam4-1-images/p21.jpg",
+          options: [],
+          correctAnswer: "正三角形，60度",
+          explanation: {
+            title: "【旋轉產生的等腰與夾角】",
+            coreConcept: "一個點繞中心旋轉 60°，該點與其旋轉後的新位置，必定與中心點構成「正三角形」。線段旋轉後的交角等於旋轉角。",
+            details: [
+              { opt: "題 1", desc: "P 點繞著 R 點旋轉 60° 來到 S 點。這意味著旋轉半徑 RP = RS (等腰)，且頂角 ∠PRS = 60°。一個頂角是 60° 的等腰三角形，必然是「正三角形」。" },
+              { opt: "題 2", desc: "∠1 是原始線段 PQ 與旋轉後的新線段 ST 的夾角。幾何定理指出：任何線段在平面上旋轉 θ 度後，新舊線段所在的直線夾角必定也是 θ 度。所以 ∠1 = 60°。" }
+            ]
+          }
+        }
+      ];
+
+      // 將錯題依據「出處 -> 頁碼 -> 題號」進行排序與分組
+      const sortedQuestions = [...questions].sort((a, b) => {
+        if (a.source !== b.source) return a.source.localeCompare(b.source);
+        if (a.page !== b.page) return a.page - b.page;
+        return a.id - b.id;
+      });
+
+      const groupedQuestions = sortedQuestions.reduce((acc, q) => {
+        const groupName = q.source; // 完全以出處作為最高層級的分組依據
+        if (!acc[groupName]) acc[groupName] = [];
+        acc[groupName].push(q);
+        return acc;
+      }, {});
+
+      return (
+        <div className="min-h-screen font-sans print:bg-white print:py-0 py-4 sm:py-8">
+          
+          {/* 操作區塊 (列印時隱藏) */}
+          <div className="w-full max-w-[98%] xl:max-w-[95%] mx-auto mb-4 sm:mb-6 px-2 sm:px-4 print:hidden">
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800">📖 左營國中 國二下 數學錯題本</h1>
+                <h2 className="text-lg font-semibold text-gray-700 mt-1">第二次段考總複習(CH3-1~3-4) 完整解析版</h2>
+                <p className="text-gray-500 text-sm mt-2">請選擇您要列印的模式。列印格式已預設優化為 A4 直式。</p>
+              </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => handlePrint('exam')}
+                  className="px-5 py-2.5 bg-indigo-50 text-indigo-600 font-semibold rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors flex items-center gap-2 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  列印考卷 (隱藏解析)
+                </button>
+                <button 
+                  onClick={() => handlePrint('solution')}
+                  className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  列印解析卷
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* A4 列印頁面主體 (在螢幕上滿版展開，列印時維持 210mm) */}
+          <div className="w-full max-w-[98%] xl:max-w-[95%] mx-auto bg-white shadow-xl print:w-[210mm] print:max-w-[210mm] print:shadow-none min-h-[297mm] p-6 sm:p-10 print:p-0 print:m-0">
+            
+            {/* 試卷表頭 */}
+            <div className="text-center mb-8 border-b-2 border-gray-800 pb-4">
+              <h2 className="text-2xl font-extrabold tracking-wide text-gray-900">左營國中 國二下 數學科 考前衝刺</h2>
+              <h3 className="text-xl font-bold text-gray-800 mt-2">第二次段考總複習(CH3-1~3-4) 完整解析版</h3>
+              <div className="flex justify-between mt-6 text-lg font-medium text-gray-700">
+                <span>錯題筆記 (收錄原卷 選擇10題 + 填充15題)</span>
+                <span>姓名：<span className="font-bold text-xl tracking-widest border-b-2 border-gray-800 px-8 pb-1">蔡睿澄</span></span>
+              </div>
+            </div>
+
+            {/* 題目列表 */}
+            <div className={`flex flex-col ${printMode === 'exam' ? 'gap-6 print:gap-4' : 'gap-10 print:gap-10'}`}>
+              {Object.entries(groupedQuestions).map(([groupName, groupQs], groupIndex) => (
+                <div key={groupName} className={`flex flex-col ${printMode === 'exam' ? 'gap-4 print:gap-2' : 'gap-8 print:gap-8'} ${groupIndex > 0 && printMode !== 'exam' ? 'print:break-before-page' : ''}`}>
+                  
+                  {groupQs.map((q, index) => {
+                    const isFirst = index === 0;
+                    // 將 10 以後的題號轉換為填充題顯示
+                    const displayId = q.id > 10 ? `填充 ${q.id - 10}` : q.id;
+                    
+                    // 判斷選項長度來決定排版欄位數 (智慧橫式排版)
+                    const maxOptLen = q.options.length > 0 ? Math.max(...q.options.map(o => o.length)) : 0;
+                    let gridColsClass = 'grid-cols-1';
+                    if (q.options.length > 4) {
+                      gridColsClass = 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 print:grid-cols-4'; 
+                    } else if (q.options.length > 0) {
+                      if (maxOptLen <= 15) {
+                        gridColsClass = 'grid-cols-2 lg:grid-cols-4 print:grid-cols-4'; 
+                      } else if (maxOptLen <= 30) {
+                        gridColsClass = 'grid-cols-1 lg:grid-cols-2 print:grid-cols-2'; 
+                      } else {
+                        gridColsClass = 'grid-cols-1'; 
+                      }
+                    }
+
+                    // 單一題目的內容區塊
+                    const questionContent = (
+                      <div key={`${q.source}-${q.page}-${q.id}`} className={`flex flex-row border-b border-gray-300 ${printMode === 'exam' ? 'pb-4 print:pb-3' : 'pb-8 print:pb-8'} ${!isFirst ? 'print:break-inside-avoid' : ''}`}>
+                        
+                        {/* 左側：題目區 */}
+                        <div className="w-[60%] print:w-[65%] pr-6 border-r-2 border-dashed border-gray-300">
+                          <div className="flex gap-2">
+                            <span className="font-bold text-xl whitespace-nowrap text-blue-900">
+                              {displayId}.
+                            </span>
+                            <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
+                              {q.question}
+                            </div>
+                          </div>
+                          
+                          {/* 支援單張或多張圖片顯示 */}
+                          {q.imageUrl && (
+                            <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-1' : 'mt-4 mb-2'} pl-6`}>
+                              <img src={q.imageUrl} alt="題目附圖" className="w-auto h-auto max-w-[85%] max-h-56 rounded border border-gray-200 shadow-sm print:max-w-[80%] print:max-h-48 print:shadow-none print:border-gray-400" />
+                            </div>
+                          )}
+
+                          {q.options.length > 0 && (
+                            <div className={`${printMode === 'exam' ? 'mt-2 print:mt-1' : 'mt-4'} pl-6 grid ${gridColsClass} ${printMode === 'exam' ? 'gap-y-1 gap-x-4 print:gap-y-0' : 'gap-y-2 gap-x-4'} text-lg`}>
+                              {q.options.map((opt, idx) => (
+                                <div key={idx} className="text-gray-700">{opt}</div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* 填充題留白區塊 (僅在考試模式顯示) */}
+                          {q.options.length === 0 && printMode === 'exam' && (
+                            <div className="mt-4 pl-6 flex items-end">
+                              <span className="text-lg font-medium text-gray-700 mr-2">答：</span>
+                              <div className="border-b-2 border-gray-400 w-48 h-6"></div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 右側：解析區 */}
+                        <div className="w-[40%] print:w-[35%] pl-6 relative">
+                          <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
+                            <div className="flex items-center gap-2 mb-4 text-blue-800">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                              <span className="font-bold text-xl">深度解析</span>
+                              <span className="ml-auto bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-base font-bold shadow-sm">
+                                解答：{q.correctAnswer}
+                              </span>
+                            </div>
+                            
+                            <div className="bg-blue-50/50 p-5 rounded-lg border border-blue-100">
+                              <h4 className="font-bold text-lg sm:text-xl text-[#FF0000] mb-3">{q.explanation.title}</h4>
+                              <p className="text-gray-700 mb-5 leading-relaxed text-base sm:text-lg bg-yellow-100/50 p-3 rounded whitespace-pre-wrap">
+                                <span className="font-semibold text-amber-700">💡 核心觀念：</span>
+                                {q.explanation.coreConcept}
+                              </p>
+                              
+                              <ul className="space-y-4">
+                                {q.explanation.details.map((detail, idx) => (
+                                  <li key={idx} className="text-base sm:text-lg leading-relaxed whitespace-pre-wrap">
+                                    {detail.opt && (
+                                      <span className={`font-semibold mr-2 ${q.correctAnswer !== "見解析" && q.correctAnswer !== "" && detail.opt.includes(q.correctAnswer.charAt(0)) ? 'text-green-700' : 'text-gray-800'}`}>
+                                        {detail.opt}
+                                      </span>
+                                    )}
+                                    <span className="text-gray-600">
+                                      {detail.desc}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    );
+
+                    if (isFirst) {
+                      return (
+                        <div key={`wrapper-${groupName}`} className="print:break-inside-avoid flex flex-col">
+                          {/* 出處標題標籤 */}
+                          <div className={`flex items-center border-b-2 border-gray-400 pb-2 ${printMode === 'exam' ? 'mb-2 print:mb-1' : 'mb-4'} print:border-gray-800`}>
+                            <span className={`bg-[#FF0000] text-white px-4 py-1.5 text-md font-bold rounded-t-lg tracking-widest print:bg-white print:border-2 print:text-[#FF0000] print:border-[#FF0000] print:rounded-md print:px-3`}>
+                              📂 考卷來源：{groupName} (共 {groupQs.length} 題)
+                            </span>
+                          </div>
+                          {questionContent}
+                        </div>
+                      );
+                    }
+
+                    return questionContent;
+                  })}
+                </div>
+              ))}
+            </div>
+
+            {/* 頁尾 */}
+            <div className="mt-8 text-center text-gray-400 text-sm print:block">
+              - 徹底搞懂每一題，數學高分不是夢 -
+            </div>
+
+          </div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MistakeNotebook />);
+  </script>
+</body>
+</html>
