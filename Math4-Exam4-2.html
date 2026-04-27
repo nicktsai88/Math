@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-4 中垂線與角平分線性質 數學錯題本</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 React 與 ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- 引入 Babel 供瀏覽器直接解析 JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- 引入 KaTeX 數學公式渲染庫 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+  <!-- 列印專屬的 CSS 設定 -->
+  <style>
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 15mm;
+      }
+      body {
+        background-color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // 新增：用於安全渲染 LaTeX 數學公式的 React 元件
+    const MathText = ({ content, className = "" }) => {
+      const createMarkup = (str) => {
+        if (typeof str !== 'string') return { __html: '' };
+        // 透過正規表達式捕捉被 $ 符號包圍的數學公式
+        const parts = str.split(/(\$.*?\$)/g);
+        const html = parts.map(part => {
+          if (part.startsWith('$') && part.endsWith('$')) {
+            const math = part.slice(1, -1);
+            try {
+              // 呼叫 KaTeX 渲染數學公式
+              return katex.renderToString(math, { throwOnError: false });
+            } catch (e) {
+              return part; // 若解析失敗則回退為原始字串
+            }
+          }
+          // 將一般文字的特殊字元跳脫，避免 HTML 跑版
+          return part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }).join('');
+        return { __html: html };
+      };
+      return <span className={className} dangerouslySetInnerHTML={createMarkup(content)} />;
+    };
+
+    const MistakeNotebook = () => {
+      const [printMode, setPrintMode] = useState('solution'); // 'exam' or 'solution'
+
+      const handlePrint = (mode) => {
+        setPrintMode(mode);
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      };
+
+      const questions = [
+        // ==================== 選擇題 (8題) ====================
+        {
+          id: 1,
+          type: "choice",
+          topic: "等腰三角形與畢氏定理",
+          question: "如圖，$\\triangle ABC$中，$\\overline{CD}$是$\\overline{AB}$上的高，若$\\overline{AC}=\\overline{CE}=13$，$\\overline{AE}=10$，$\\overline{BC}=15$，則$\\overline{BE}=?$",
+          imageUrl: "Math4-Exam4-2-images/a1.jpg",
+          options: [
+            "(A) 3",
+            "(B) 4",
+            "(C) 5",
+            "(D) 6"
+          ],
+          correctAnswer: "B",
+          explanation: {
+            title: "【等腰三角形的高與底邊平分】",
+            coreConcept: "等腰三角形頂角所作的高，必垂直平分底邊。再搭配畢氏定理求解未知的邊長。",
+            details: [
+              { opt: "Step 1", desc: "在 $\\triangle ACE$ 中，因為 $\\overline{AC}=\\overline{CE}=13$，所以這是一個等腰三角形。" },
+              { opt: "Step 2", desc: "因為 $\\overline{CD}$ 垂直 $\\overline{AE}$（高），所以 $D$ 是 $\\overline{AE}$ 的中點，推得 $\\overline{AD}=\\overline{DE}=10 \\div 2 = 5$。" },
+              { opt: "Step 3", desc: "在直角 $\\triangle CDE$ 中，利用畢氏定理求出高：$\\overline{CD} = \\sqrt{13^2 - 5^2} = \\sqrt{169-25} = \\sqrt{144} = 12$。" },
+              { opt: "Step 4", desc: "在直角 $\\triangle CDB$ 中，再次利用畢氏定理求底邊：$\\overline{BD} = \\sqrt{15^2 - 12^2} = \\sqrt{225-144} = \\sqrt{81} = 9$。" },
+              { opt: "Step 5", desc: "最後求目標線段：$\\overline{BE} = \\overline{BD} - \\overline{DE} = 9 - 5 = 4$。" }
+            ]
+          }
+        },
+        {
+          id: 2,
+          type: "choice",
+          topic: "中垂線性質問周長",
+          question: "如圖，$\\triangle ABC$中，$\\overline{AB}$的中垂線交$\\overline{BC}$於$D$點，交$\\overline{AB}$於$E$點，若$\\overline{AB}=16$，$\\overline{DE}=6$，$\\overline{DC}=8$，$\\overline{AC}=10$，則$\\triangle ABC$周長為多少?",
+          imageUrl: "Math4-Exam4-2-images/a2.jpg",
+          options: [
+            "(A) 30",
+            "(B) 34",
+            "(C) 40",
+            "(D) 44"
+          ],
+          correctAnswer: "D",
+          explanation: {
+            title: "【中垂線點到兩端點等距】",
+            coreConcept: "中垂線上任意一點，到線段兩端點的距離相等（$\\overline{DA}=\\overline{DB}$）。",
+            details: [
+              { opt: "Step 1", desc: "因為直線 $DE$ 是 $\\overline{AB}$ 的中垂線，所以 $E$ 是中點，$\\overline{AE} = \\overline{BE} = 16 \\div 2 = 8$。" },
+              { opt: "Step 2", desc: "在直角 $\\triangle ADE$ 中，已知 $\\overline{AE}=8, \\overline{DE}=6$，利用畢氏定理求出 $\\overline{AD} = \\sqrt{8^2+6^2} = \\sqrt{100} = 10$。" },
+              { opt: "Step 3", desc: "根據中垂線性質，$\\overline{BD} = \\overline{AD} = 10$。" },
+              { opt: "Step 4", desc: "計算 $\\triangle ABC$ 周長 = $\\overline{AB} + \\overline{BC} + \\overline{AC} = 16 + (\\overline{BD} + \\overline{DC}) + 10$。" },
+              { opt: "Step 5", desc: "代入數據：$16 + (10 + 8) + 10 = 16 + 18 + 10 = 44$。" }
+            ]
+          }
+        },
+        {
+          id: 3,
+          type: "choice",
+          topic: "中垂線的基本定義",
+          question: "如圖，已知四邊形ABCD中，$L$為$\\overline{AD}$的中垂線，$P$為$L$上任意一點，下列哪一個等式恆成立?",
+          imageUrl: "Math4-Exam4-2-images/a3.jpg",
+          options: [
+            "(A) $\\overline{PA}=\\overline{PB}$",
+            "(B) $\\overline{PB}=\\overline{PC}$",
+            "(C) $\\overline{PC}=\\overline{PD}$",
+            "(D) $\\overline{PD}=\\overline{PA}$"
+          ],
+          correctAnswer: "D",
+          explanation: {
+            title: "【中垂線樞紐性質】",
+            coreConcept: "垂直平分線（中垂線）的最核心定義：線上任一點到該線段兩端點距離必相等。",
+            details: [
+              { opt: "解析", desc: "題目明確指出 $L$ 是線段 $\\overline{AD}$ 的中垂線。這代表 $L$ 上的任何一個點（包含 $P$ 點），到線段兩個端點 $A$ 與 $D$ 的距離一定相等。" },
+              { opt: "結論", desc: "因此 $\\overline{PA} = \\overline{PD}$ 是絕對恆成立的真理，不受四邊形其他頂點位置的影響。" }
+            ]
+          }
+        },
+        {
+          id: 4,
+          type: "choice",
+          topic: "內心夾角公式應用",
+          question: "$\\triangle ABC$中，$\\angle A=120^\\circ$，且$\\angle B$和$\\angle C$的角平分線相交於$I$點，則$\\angle BIC$的度數為何?",
+          imageUrl: "",
+          options: [
+            "(A) $120^\\circ$",
+            "(B) $130^\\circ$",
+            "(C) $140^\\circ$",
+            "(D) $150^\\circ$"
+          ],
+          correctAnswer: "D",
+          explanation: {
+            title: "【內心夾角的速算公式】",
+            coreConcept: "三角形兩內角平分線的交角（內心夾角）公式：$\\angle BIC = 90^\\circ + \\frac{1}{2}\\angle A$。",
+            details: [
+              { opt: "常規解法", desc: "$\\angle B + \\angle C = 180^\\circ - 120^\\circ = 60^\\circ$。兩角平分線分出來的一半和為 $60^\\circ \\div 2 = 30^\\circ$。所以 $\\angle BIC = 180^\\circ - 30^\\circ = 150^\\circ$。" },
+              { opt: "公式快解", desc: "直接套用公式：$\\angle BIC = 90^\\circ + \\frac{120^\\circ}{2} = 90^\\circ + 60^\\circ = 150^\\circ$。" }
+            ]
+          }
+        },
+        {
+          id: 5,
+          type: "choice",
+          topic: "點到線等距的幾何作圖",
+          question: "如圖，$\\triangle ABC$中，$\\angle C=90^\\circ$，若想在$\\overline{AC}$上作一點$P$，使得$P$點到$\\overline{AB}$的距離等於$\\overline{PC}$，則下列哪一種作法是正確的?",
+          imageUrl: "Math4-Exam4-2-images/a5.jpg",
+          options: [
+            "(A)作$\\overline{AB}$中垂線交$\\overline{AC}$於$P$",
+            "(B)作$\\overline{AC}$中垂線交$\\overline{AC}$於$P$",
+            "(C)作$\\angle B$的平分線交$\\overline{AC}$於$P$",
+            "(D)作$\\angle C$的平分線交$\\overline{AB}$於$D$，過$D$作$\\overline{AC}$的垂直線交$\\overline{AC}$於$P$"
+          ],
+          correctAnswer: "C",
+          explanation: {
+            title: "【角平分線作圖的意義】",
+            coreConcept: "角平分線上的點，到構成該角的「兩邊（射線）」距離相等。",
+            details: [
+              { opt: "條件轉換", desc: "因為 $\\angle C = 90^\\circ$，所以 $\\overline{AC}$ 垂直於 $\\overline{BC}$。這代表「$P$點到$C$點的距離 $\\overline{PC}$」其實就是「$P$點到直線$\\overline{BC}$的垂直距離」。" },
+              { opt: "幾何意義", desc: "題目要求 $P$ 到 $\\overline{AB}$ 的距離 = $P$ 到 $\\overline{BC}$ 的距離。要滿足「到兩邊等距」的條件，$P$ 點必須位在兩邊夾角（$\\angle B$）的「角平分線」上。" },
+              { opt: "結論", desc: "因此正確作法是：作 $\\angle B$ 的角平分線，該線與 $\\overline{AC}$ 的交點即為符合條件的 $P$ 點。" }
+            ]
+          }
+        },
+        {
+          id: 6,
+          type: "choice",
+          topic: "中垂線與角平分線的綜合點位",
+          question: "如圖，在$\\triangle ABC$內找一點$P$，使得$P$點到$B$、$C$兩點等距離，且$P$點到$\\overline{BC}$、$\\overline{AB}$也等距離，則可用下列哪一種方法求得$P$點?",
+          imageUrl: "Math4-Exam4-2-images/a6.jpg",
+          options: [
+            "(A)作$\\angle A$與$\\angle B$角平分線的交點",
+            "(B)作$\\overline{BC}$與$\\overline{AB}$中垂線的交點",
+            "(C)作$\\angle B$的角平分線與$\\overline{BC}$中垂線的交點",
+            "(D)作$\\angle C$的角平分線與$\\overline{AB}$中垂線的交點"
+          ],
+          correctAnswer: "C",
+          explanation: {
+            title: "【拆解複合軌跡條件】",
+            coreConcept: "「到兩點等距」找中垂線；「到兩邊(線)等距」找角平分線。",
+            details: [
+              { opt: "條件一", desc: "「$P$ 點到 $B$、$C$ 兩『點』等距離」 $\\implies$ 點 $P$ 必定落在線段 $\\overline{BC}$ 的「中垂線」上。" },
+              { opt: "條件二", desc: "「$P$ 點到 $\\overline{BC}$、$\\overline{AB}$ 兩『線』等距離」 $\\implies$ 點 $P$ 必定落在這兩線的夾角 $\\angle B$ 的「角平分線」上。" },
+              { opt: "結論", desc: "同時滿足上述兩個條件，就必須作 $\\angle B$ 角平分線與 $\\overline{BC}$ 中垂線，兩者的交點即為所求。" }
+            ]
+          }
+        },
+        {
+          id: 7,
+          type: "choice",
+          topic: "等腰三角形頂角平分線性質",
+          question: "如圖，$\\overline{AB}=\\overline{AC}$，$\\overline{AD}$為$\\angle BAC$的角平分線，則下列敘述何者錯誤?",
+          imageUrl: "Math4-Exam4-2-images/a7.jpg",
+          options: [
+            "(A) $\\triangle BAD \\cong \\triangle CAD$",
+            "(B) $\\angle ADB=90^\\circ$",
+            "(C) $\\angle B=\\angle C$",
+            "(D) $\\overline{AC}=2\\overline{CD}$"
+          ],
+          correctAnswer: "D",
+          explanation: {
+            title: "【等腰三角形三線合一】",
+            coreConcept: "等腰三角形的「頂角平分線」、「底邊中垂線」、「底邊中線」三條線會完全重合。",
+            details: [
+              { opt: "(A) 正確", desc: "透過 SAS (兩腰相等、夾角被平分、共用邊 $\\overline{AD}$)，可證 $\\triangle BAD \\cong \\triangle CAD$。" },
+              { opt: "(B) 正確", desc: "因為全等，$\\angle ADB = \\angle ADC$，且兩角構成平角 $180^\\circ$，故各為 $90^\\circ$。" },
+              { opt: "(C) 正確", desc: "等腰三角形的兩底角必然相等。" },
+              { opt: "(D) 錯誤", desc: "$\\overline{CD}$ 是底邊的一半，而 $\\overline{AC}$ 是斜邊。在直角 $\\triangle ADC$ 中，斜邊長與底邊長並沒有必然的 2 倍關係（除非這剛好是一個包含 $30^\\circ-60^\\circ-90^\\circ$ 的正三角形一半，但題目並未指定）。" }
+            ]
+          }
+        },
+        {
+          id: 8,
+          type: "choice",
+          topic: "角平分線與面積法綜合應用",
+          question: "如圖，已知$\\triangle ABC$中，$\\angle C=90^\\circ$，$\\overline{BD}$為$\\angle ABC$的角平分線，$\\overline{DE} \\perp \\overline{AB}$，若$\\overline{AC}=6$，$\\overline{BC}=8$，則$\\overline{DE}=?$",
+          imageUrl: "Math4-Exam4-2-images/a8.jpg",
+          options: [
+            "(A) 2",
+            "(B) 3",
+            "(C) $\\frac{5}{2}$",
+            "(D) $\\frac{8}{3}$"
+          ],
+          correctAnswer: "D",
+          explanation: {
+            title: "【面積分割法求垂距】",
+            coreConcept: "利用角平分線到兩邊等距的特性，假設高為 $x$，再利用「大三角形面積 = 兩個小三角形面積和」來解代數。",
+            details: [
+              { opt: "Step 1", desc: "在直角 $\\triangle ABC$ 中，已知兩股 $\\overline{AC}=6, \\overline{BC}=8$，利用畢氏定理求出斜邊 $\\overline{AB} = \\sqrt{6^2+8^2} = 10$。" },
+              { opt: "Step 2", desc: "計算 $\\triangle ABC$ 的總面積 = $\\frac{1}{2} \\times 8 \\times 6 = 24$。" },
+              { opt: "Step 3", desc: "因為 $\\overline{BD}$ 是角平分線，所以 $D$ 點到兩邊的垂直距離相等。已知 $\\angle C=90^\\circ$ 所以 $\\overline{DC} \\perp \\overline{BC}$，推得 $\\overline{DE} = \\overline{DC} = x$。" },
+              { opt: "Step 4", desc: "將大三角形切分為 $\\triangle ABD$ 與 $\\triangle BCD$。面積和方程式：$\\frac{1}{2} \\times \\overline{AB} \\times x + \\frac{1}{2} \\times \\overline{BC} \\times x = 24$。" },
+              { opt: "Step 5", desc: "代入數字：$\\frac{1}{2}(10x) + \\frac{1}{2}(8x) = 24 \\implies 5x + 4x = 24 \\implies 9x = 24 \\implies x = \\frac{24}{9} = \\frac{8}{3}$。" }
+            ]
+          }
+        },
+
+        // ==================== 填充題 (6題) ====================
+        {
+          id: 9,
+          type: "fill",
+          topic: "中垂線與畢氏定理代數解",
+          question: "如圖，直角三角形ABC中，$\\angle A=90^\\circ$，$\\overline{AB}=8$，$\\overline{AC}=6$，若$L$為$\\overline{BC}$的中垂線交$\\overline{BC}$於$M$，交$\\overline{AB}$於$N$，則$\\overline{AN}=?$",
+          imageUrl: "Math4-Exam4-2-images/b1.jpg",
+          options: [],
+          correctAnswer: "7/4",
+          explanation: {
+            title: "【設未知數解直角三角形】",
+            coreConcept: "利用中垂線等距性質轉換邊長，將問題濃縮到一個直角三角形中以畢氏定理解決。",
+            details: [
+              { opt: "Step 1", desc: "因為 $N$ 點位於 $\\overline{BC}$ 的中垂線上，根據中垂線性質：$\\overline{NB} = \\overline{NC}$。" },
+              { opt: "Step 2", desc: "設要求的 $\\overline{AN} = x$。因為總長 $\\overline{AB} = 8$，所以剩下的 $\\overline{NB} = 8 - x$。" },
+              { opt: "Step 3", desc: "既然 $\\overline{NB} = \\overline{NC}$，所以斜邊 $\\overline{NC}$ 也是 $8 - x$。" },
+              { opt: "Step 4", desc: "在直角 $\\triangle ANC$ 中，三邊分別為 $x$、$6$、$8-x$。套用畢氏定理：$(8-x)^2 = x^2 + 6^2$。" },
+              { opt: "Step 5", desc: "展開方程式：$64 - 16x + x^2 = x^2 + 36 \\implies 16x = 28 \\implies x = \\frac{28}{16} = \\frac{7}{4}$。" }
+            ]
+          }
+        },
+        {
+          id: 10,
+          type: "fill",
+          topic: "內心與旁心夾角計算",
+          question: "如圖，$\\triangle ABC$中，$\\angle A$的外角為$134^\\circ$，$\\angle B$和$\\angle C$的內角平分線相交於$I$點，$\\angle B$的內角平分線和$\\angle C$的外角平分線相交於$P$點，則：\n(1) $\\angle BIC=$ _______度。\n(2) $\\angle P=$ _______度。",
+          imageUrl: "Math4-Exam4-2-images/b2.jpg",
+          options: [],
+          correctAnswer: "(1) 113   (2) 23",
+          explanation: {
+            title: "【角平分線公式大全】",
+            coreConcept: "求出頂角 $\\angle A$ 後，直接套用內心與旁心的快速公式解題。",
+            details: [
+              { opt: "求頂角", desc: "$\\angle A$ 的外角是 $134^\\circ$，所以內角 $\\angle A = 180^\\circ - 134^\\circ = 46^\\circ$。" },
+              { opt: "解 (1)", desc: "$I$ 為兩內角平分線交點（內心），夾角公式為：$\\angle BIC = 90^\\circ + \\frac{\\angle A}{2} = 90^\\circ + \\frac{46^\\circ}{2} = 90^\\circ + 23^\\circ = 113^\\circ$。" },
+              { opt: "解 (2)", desc: "$P$ 為一內一外的角平分線交點（旁心），夾角公式為：$\\angle P = \\frac{\\angle A}{2} = \\frac{46^\\circ}{2} = 23^\\circ$。" }
+            ]
+          }
+        },
+        {
+          id: 11,
+          type: "fill",
+          topic: "圖形拼貼與全等條件",
+          question: "若用兩塊全等的三角形紙板可緊密拼出一個大三角形，則原來的小紙板必須是_______三角形。(填銳角、鈍角、等腰、直角或正)",
+          imageUrl: "",
+          options: [],
+          correctAnswer: "直角",
+          explanation: {
+            title: "【緊密拼合的直線條件】",
+            coreConcept: "兩個圖形要能拼成一個更大的三角形，拼合處的兩個角加起來必須剛好是 $180^\\circ$ 形成一直線。",
+            details: [
+              { opt: "推導", desc: "要將兩塊「全等」的三角形拼成一個「大三角形」，勢必是將兩塊紙板沿著相同長度的邊貼齊。" },
+              { opt: "關鍵", desc: "貼齊後，原本兩個頂點合併處必須構成一條筆直的底邊（平角 $180^\\circ$），否則形狀會凹折成四邊形。既然兩個全等的角相加要等於 $180^\\circ$，每個角就必須剛好是 $90^\\circ$。" },
+              { opt: "結論", desc: "因此，這兩塊全等的小紙板必須具備 $90^\\circ$ 的角，亦即「直角三角形」。" }
+            ]
+          }
+        },
+        {
+          id: 12,
+          type: "fill",
+          topic: "等腰三角形與面積反推",
+          question: "如圖，$\\triangle ABC$中，$\\overline{AD}$為$\\overline{BC}$的中垂線，$\\overline{DE} \\perp \\overline{AB}$，$\\overline{DF} \\perp \\overline{AC}$，已知$\\triangle ABC$的面積為300，$\\overline{BC}=30$，則：\n(1) $\\overline{AB}=$ _______。\n(2) $\\overline{DE}=$ _______。",
+          imageUrl: "Math4-Exam4-2-images/b4.jpg",
+          options: [],
+          correctAnswer: "(1) 25   (2) 12",
+          explanation: {
+            title: "【面積與底高轉換】",
+            coreConcept: "利用大三角形面積反推中垂線的高，接著看半邊的直角三角形面積來求未知的垂距。",
+            details: [
+              { opt: "Step 1", desc: "因為 $\\overline{AD}$ 是 $\\overline{BC}$ 的中垂線，所以 $\\triangle ABC$ 是等腰三角形，且底邊被平分 $\\overline{BD} = 15$。" },
+              { opt: "Step 2", desc: "利用 $\\triangle ABC$ 總面積求高 $\\overline{AD}$：$\\frac{1}{2} \\times \\overline{BC} \\times \\overline{AD} = 300 \\implies \\frac{1}{2} \\times 30 \\times \\overline{AD} = 300 \\implies \\overline{AD} = 20$。" },
+              { opt: "Step 3", desc: "在直角 $\\triangle ABD$ 中，透過畢氏定理求斜邊 $\\overline{AB} = \\sqrt{15^2 + 20^2} = \\sqrt{225 + 400} = \\sqrt{625} = 25$。完成第(1)題。" },
+              { opt: "Step 4", desc: "現在將目光鎖定在左半邊的 $\\triangle ABD$。它的面積是大三角形的一半，即 $150$。" },
+              { opt: "Step 5", desc: "在 $\\triangle ABD$ 中，若把 $\\overline{AB}$ 當作底，$\\overline{DE}$ 就是它對應的高。列出面積式：$\\frac{1}{2} \\times \\overline{AB} \\times \\overline{DE} = 150 \\implies \\frac{1}{2} \\times 25 \\times \\overline{DE} = 150 \\implies 25 \\times \\overline{DE} = 300 \\implies \\overline{DE} = 12$。" }
+            ]
+          }
+        },
+        {
+          id: 13,
+          type: "fill",
+          topic: "圖形摺疊與中垂線",
+          question: "如圖，$\\triangle ABC$中，$\\overline{AB}=\\overline{AC}$，若沿著$\\overline{DE}$對摺，可使$A$和$C$重合，若$\\overline{AB}=18$，$\\overline{BE}=3$，則$\\triangle AEC$的周長為_______；$\\triangle AEC$的面積為_______。",
+          imageUrl: "Math4-Exam4-2-images/b5.jpg",
+          options: [],
+          correctAnswer: "周長:48 ， 面積:108",
+          explanation: {
+            title: "【摺紙原理：摺線即為中垂線】",
+            coreConcept: "圖形對摺時能讓兩點重合，代表摺線必定是這兩點連線的中垂線。",
+            details: [
+              { opt: "摺疊含義", desc: "沿 $\\overline{DE}$ 摺疊使 $A$、$C$ 重合，這意味著 $\\overline{DE}$ 是一面完美的鏡子（也就是 $\\overline{AC}$ 的中垂線），所以 $\\overline{EA} = \\overline{EC}$，且 $D$ 是 $\\overline{AC}$ 中點。" },
+              { opt: "求邊長", desc: "已知 $\\overline{AB} = 18$ 且 $E$ 在 $\\overline{AB}$ 上。$\\overline{AE} = \\overline{AB} - \\overline{BE} = 18 - 3 = 15$。因為 $\\overline{EA} = \\overline{EC}$，所以 $\\overline{EC} = 15$。又大三角形為等腰 $\\overline{AC} = \\overline{AB} = 18$。" },
+              { opt: "算周長", desc: "$\\triangle AEC$ 周長 = $\\overline{AE} + \\overline{EC} + \\overline{AC} = 15 + 15 + 18 = 48$。" },
+              { opt: "算面積", desc: "在 $\\triangle AEC$ 中，若以 $\\overline{AC}$ 為底（長度 $18$），那麼高就是 $\\overline{ED}$。因為 $D$ 是中點，$\\overline{AD} = 9$。在直角 $\\triangle ADE$ 中，$\\overline{ED} = \\sqrt{15^2 - 9^2} = \\sqrt{225-81} = \\sqrt{144} = 12$。" },
+              { opt: "面積解答", desc: "$\\triangle AEC$ 面積 = $\\frac{1}{2} \\times \\text{底} \\times \\text{高} = \\frac{1}{2} \\times 18 \\times 12 = 108$。" }
+            ]
+          }
+        },
+        {
+          id: 14,
+          type: "fill",
+          topic: "角平分線與全等三角形",
+          question: "如圖，已知$\\overline{AP}$平分$\\angle BAC$，且$\\overline{PB}=\\overline{PC}$。若$\\overline{AB}=24$，$\\overline{AC}=18$，$\\angle C=120^\\circ$，則：\n(1) $\\angle B=$ _______度。\n(2) $\\overline{PB}=$ _______。",
+          imageUrl: "Math4-Exam4-2-images/b6.jpg",
+          options: [],
+          correctAnswer: "(1) 60   (2) 6",
+          explanation: {
+            title: "【作輔助線構造 RHS 全等】",
+            coreConcept: "從角平分線上一點向兩邊作垂直線，將複雜的不規則圖形化為全等直角三角形來解題。",
+            details: [
+              { opt: "Step 1", desc: "作輔助線：從 $P$ 點分別向 $\\overline{AB}$ 邊、以及 $\\overline{AC}$ 的延長線作垂直線，交點設為 $M$ 與 $N$。" },
+              { opt: "Step 2", desc: "因為 $\\overline{AP}$ 是角平分線，所以垂距相等 $\\overline{PM} = \\overline{PN}$，且 $\\triangle APM \\cong \\triangle APN$ (AAS)，推得 $\\overline{AM} = \\overline{AN}$。" },
+              { opt: "Step 3", desc: "在 $\\triangle PBM$ 與 $\\triangle PCN$ 中：有直角、斜邊 $\\overline{PB}=\\overline{PC}$ (已知)、一股 $\\overline{PM}=\\overline{PN}$，故 $\\triangle PBM \\cong \\triangle PCN$ (RHS)。推得 $\\overline{BM} = \\overline{CN} = x$ 且對應角 $\\angle PBM = \\angle PCN$。" },
+              { opt: "Step 4", desc: "代入邊長：$\\overline{AM} = 24 - x$，$\\overline{AN} = 18 + x$。既然 $\\overline{AM}=\\overline{AN} \\implies 24 - x = 18 + x \\implies 2x = 6 \\implies x = 3$。所以 $\\overline{BM} = 3$, $\\overline{CN} = 3$。" },
+              { opt: "Step 5", desc: "圖中 $\\angle C$（即四邊形內角 $\\angle ACP$）為 $120^\\circ$。在一直線上，外角 $\\angle PCN = 180^\\circ - 120^\\circ = 60^\\circ$。因此直角 $\\triangle PCN$ 是一個 $30^\\circ-60^\\circ-90^\\circ$ 的特殊三角形。" },
+              { opt: "Step 6", desc: "在 $\\triangle PCN$ 中，$\\angle PCN = 60^\\circ$，底邊 $CN=3$。斜邊 $\\overline{PC} = 2 \\times CN = 6$。因此 $\\overline{PB} = \\overline{PC} = 6$。完成 (2)。" },
+              { opt: "Step 7", desc: "由前面的 RHS 全等得知 $\\angle PBM = \\angle PCN$。由於 $\\angle PCN = 60^\\circ$，所以 $\\angle B$ (即 $\\angle PBM$) = $60^\\circ$。完成 (1)。" }
+            ]
+          }
+        },
+
+        // ==================== 計算題 (5題) ====================
+        {
+          id: 15,
+          type: "calc",
+          topic: "中垂線座標與線段拆解",
+          question: "如圖，$\\triangle ABC$中，直線$L$為$\\overline{AB}$的中垂線。若$\\overline{AB}=48$，$\\overline{AP}=26$，$\\overline{BC}=30$，求$\\overline{PC}$。 (6分)",
+          imageUrl: "Math4-Exam4-2-images/c1.jpg",
+          options: [],
+          correctAnswer: "8",
+          explanation: {
+            title: "【中垂線軸線上的共線計算】",
+            coreConcept: "利用中線平分底邊的特性，找出兩個直角三角形，分別用畢氏定理算出兩段高，相減即為所求。",
+            details: [
+              { opt: "Step 1", desc: "直線 $L$ 是 $\\overline{AB}$ 的中垂線，交 $\\overline{AB}$ 於 $Q$ 點。所以 $Q$ 是 $\\overline{AB}$ 中點，$\\overline{AQ} = 48 \\div 2 = 24$。" },
+              { opt: "Step 2", desc: "圖中顯示 $C$ 點也位在直線 $L$ 上，所以這是一個等腰 $\\triangle ABC$，且 $\\overline{AC} = \\overline{BC} = 30$。" },
+              { opt: "Step 3", desc: "在直角 $\\triangle AQC$ 中，利用畢氏定理求出大高 $\\overline{CQ}$：$\\overline{CQ} = \\sqrt{30^2 - 24^2} = \\sqrt{900 - 576} = \\sqrt{324} = 18$。" },
+              { opt: "Step 4", desc: "在直角 $\\triangle AQP$ 中，利用畢氏定理求出小高 $\\overline{PQ}$：$\\overline{PQ} = \\sqrt{26^2 - 24^2} = \\sqrt{676 - 576} = \\sqrt{100} = 10$。" },
+              { opt: "Step 5", desc: "觀察圖形，$P$ 點介於 $C$、$Q$ 之間，所以 $\\overline{PC} = \\overline{CQ} - \\overline{PQ} = 18 - 10 = 8$。" }
+            ]
+          }
+        },
+        {
+          id: 16,
+          type: "calc",
+          topic: "直角三角形內的對摺代數",
+          question: "如圖一，$\\triangle ABC$中，$\\angle C=90^\\circ$，$\\overline{AC}=4$，$\\overline{BC}=3$。若以$\\overline{AO}$為摺痕對摺，使$C$點與$\\overline{AB}$上的$C'$點重合，如圖二，$\\overline{CO}=?$ (8分)",
+          imageUrl: "Math4-Exam4-2-images/c2.jpg",
+          options: [],
+          correctAnswer: "4/3",
+          explanation: {
+            title: "【摺疊即全等，設未知數解畢氏】",
+            coreConcept: "圖形對摺代表兩塊圖形完全全等。將未知的摺線段設為 $x$，轉移到剩餘的直角三角形中列方程式。",
+            details: [
+              { opt: "Step 1", desc: "這是一個標準的 $3-4-5$ 直角三角形，斜邊 $\\overline{AB} = \\sqrt{3^2+4^2} = 5$。" },
+              { opt: "Step 2", desc: "沿著 $\\overline{AO}$ 對摺使 $C$ 落在 $C'$，表示 $\\triangle ACO \\cong \\triangle AC'O$。因此 $\\overline{AC'} = \\overline{AC} = 4$，且 $\\angle AC'O = \\angle C = 90^\\circ$。" },
+              { opt: "Step 3", desc: "我們要求的是 $\\overline{CO}$。設 $\\overline{CO} = x$，因為全等，所以摺過去的 $\\overline{C'O} = x$。" },
+              { opt: "Step 4", desc: "分析底下剩餘的直角 $\\triangle BOC'$：$\\overline{BO} = \\overline{BC} - x = 3 - x$。底邊 $\\overline{BC'} = \\overline{AB} - \\overline{AC'} = 5 - 4 = 1$。" },
+              { opt: "Step 5", desc: "在直角 $\\triangle BOC'$ 內套用畢氏定理：$(3-x)^2 = x^2 + 1^2 \\implies 9 - 6x + x^2 = x^2 + 1 \\implies 6x = 8 \\implies x = \\frac{4}{3}$。" }
+            ]
+          }
+        },
+        {
+          id: 17,
+          type: "calc",
+          topic: "全等三角形角度追蹤",
+          question: "如圖，$\\triangle ABC$中，$\\overline{AC}=\\overline{EB}$，$\\overline{AB}=\\overline{ED}$，$\\overline{BC}=\\overline{DB}$，若$\\overline{BD}$平分$\\angle ABC$ 且 $\\angle E=30^\\circ$，求$\\angle DBC$。 (8分)",
+          imageUrl: "Math4-Exam4-2-images/c3.jpg",
+          options: [],
+          correctAnswer: "50°",
+          explanation: {
+            title: "【SSS全等與共線角替換】",
+            coreConcept: "利用 SSS 證明全等後找出對應角，再透過「三點共線構成平角」與「三角形內角和」解聯立方程式。",
+            details: [
+              { opt: "Step 1", desc: "觀察題目給的三組邊相等，根據 SSS 全等性質可知 $\\triangle ABC \\cong \\triangle EDB$。這意味著兩三角形形狀完全一樣。對應角為：$\\angle A = \\angle E = 30^\\circ$。" },
+              { opt: "Step 2", desc: "設 $\\angle DBC = x$。因為 $\\overline{BD}$ 平分 $\\angle ABC$，所以 $\\angle ABD = x$，整個 $\\angle ABC = 2x$。" },
+              { opt: "Step 3", desc: "因為全等，$\\triangle ABC$ 的 $\\angle ABC$ (也就是 $2x$)，會對應到 $\\triangle EDB$ 的 $\\angle EDB$。所以 $\\angle EDB = 2x$。" },
+              { opt: "Step 4", desc: "觀察圖中的底邊，點 $B, C, E$ 位於同一條直線上，代表射線 $BC$ 與 $BE$ 是重合的。因此 $\\angle EBD$ 其實就是 $\\angle DBC$，所以 $\\angle EBD = x$。" },
+              { opt: "Step 5", desc: "現在將目光放到 $\\triangle EDB$ 內，三個內角和為 $180^\\circ$：$\\angle E + \\angle EDB + \\angle EBD = 180^\\circ \\implies 30^\\circ + 2x + x = 180^\\circ \\implies 3x = 150^\\circ \\implies x = 50^\\circ$。" }
+            ]
+          }
+        },
+        {
+          id: 18,
+          type: "calc",
+          topic: "連環角平分線縮放",
+          question: "如圖，$\\overline{AB}=\\overline{AC}$，$\\overline{BD}$平分$\\angle ABC$，$\\overline{CD}$平分$\\angle ACB$，$\\overline{BE}$平分$\\angle DBC$，$\\overline{CE}$平分$\\angle DCB$，且$\\angle BEC=160^\\circ$，求$\\angle A$。 (8分)",
+          imageUrl: "Math4-Exam4-2-images/c4.jpg",
+          options: [],
+          correctAnswer: "100°",
+          explanation: {
+            title: "【連環角平分線與等腰三角形】",
+            coreConcept: "利用等腰三角形底角相等，配合兩次角平分線逐步縮小角度範圍，找出最核心的角度後再反推放大。",
+            details: [
+              { opt: "Step 1", desc: "因為 $\\overline{AB}=\\overline{AC}$，所以最外層的 $\\triangle ABC$ 為等腰三角形，底角必定相等 $\\angle ABC = \\angle ACB$。" },
+              { opt: "Step 2", desc: "第一層平分：$\\overline{BD}$ 與 $\\overline{CD}$ 分別平分兩個底角，故 $\\angle DBC = \\angle DCB = \\frac{1}{2} \\angle ABC$。" },
+              { opt: "Step 3", desc: "第二層平分：$\\overline{BE}$ 與 $\\overline{CE}$ 再次平分剛才的角，所以最內層的小底角 $\\angle EBC = \\angle ECB = \\frac{1}{2} \\angle DBC = \\frac{1}{4} \\angle ABC$。" },
+              { opt: "Step 4", desc: "進入最內層的 $\\triangle EBC$，已知頂角 $\\angle BEC = 160^\\circ$，所以兩個底角和 $\\angle EBC + \\angle ECB = 180^\\circ - 160^\\circ = 20^\\circ$。" },
+              { opt: "Step 5", desc: "因為這兩個小底角相等，可知 $\\angle EBC = 10^\\circ$。將其放大 4 倍推回最大的底角：$\\angle ABC = 10^\\circ \\times 4 = 40^\\circ$。" },
+              { opt: "Step 6", desc: "最後回到最大的 $\\triangle ABC$，頂角 $\\angle A = 180^\\circ - \\angle ABC - \\angle ACB = 180^\\circ - 40^\\circ - 40^\\circ = 100^\\circ$。" }
+            ]
+          }
+        },
+        {
+          id: 19,
+          type: "calc",
+          topic: "角平分線與中垂線作圖題",
+          question: "如圖，已知$\\angle AOB$的兩邊$\\overline{AO}$與$\\overline{BO}$分別有$P$、$Q$兩點，在$\\angle AOB$的內部找一點$R$，使得$R$點到$\\overline{AO}$、$\\overline{BO}$等距離且$\\overline{PR}=\\overline{QR}$。 (8分)",
+          imageUrl: "Math4-Exam4-2-images/c5.jpg",
+          options: [],
+          correctAnswer: "見解析",
+          explanation: {
+            title: "【軌跡作圖：融合中垂線與角平分線】",
+            coreConcept: "這是一道標準的幾何作圖/軌跡概念題。需將中文的文字條件，精準翻譯為對應的幾何作圖動作。",
+            details: [
+              { opt: "翻譯條件一", desc: "「$R$ 點到 $\\overline{AO}$、$\\overline{BO}$ 等距離」：到兩條『線』等距離，代表 $R$ 點必須位在兩條線夾角的「角平分線」上。因此第一步：【作 $\\angle AOB$ 的角平分線】。" },
+              { opt: "翻譯條件二", desc: "「$\\overline{PR}=\\overline{QR}$」：代表 $R$ 點到 $P$、$Q$ 兩『點』的直線距離相等，代表 $R$ 點必須位在連接這兩點的「垂直平分線（中垂線）」上。因此第二步：【連接 $\\overline{PQ}$，並作 $\\overline{PQ}$ 的中垂線】。" },
+              { opt: "最終結論", desc: "因為 $R$ 點必須同時滿足這兩個條件，所以它必定出現在這兩條特殊線段的交會處。第三步：【上述 角平分線 與 中垂線 的交點，即為所求的 $R$ 點】。" }
+            ]
+          }
+        }
+      ];
+
+      // 將錯題依據類型排序
+      const typeOrder = { 'choice': 1, 'fill': 2, 'calc': 3 };
+      const sortedQuestions = [...questions].sort((a, b) => {
+        if (typeOrder[a.type] !== typeOrder[b.type]) {
+          return typeOrder[a.type] - typeOrder[b.type];
+        }
+        return a.id - b.id;
+      });
+
+      // 分組，以便於標題顯示
+      const groupedQuestions = sortedQuestions.reduce((acc, q) => {
+        const groupName = q.type;
+        if (!acc[groupName]) acc[groupName] = [];
+        acc[groupName].push(q);
+        return acc;
+      }, {});
+
+      // 類型標題映射
+      const typeTitles = {
+        'choice': '一、選擇題',
+        'fill': '二、填充題',
+        'calc': '三、計算題'
+      };
+
+      return (
+        <div className="min-h-screen font-sans print:bg-white print:py-0 py-4 sm:py-8">
+          
+          {/* 操作區塊 (列印時隱藏) */}
+          <div className="w-full max-w-[98%] xl:max-w-[95%] mx-auto mb-4 sm:mb-6 px-2 sm:px-4 print:hidden">
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800">📖 左營國中 國二下 數學錯題本</h1>
+                <h2 className="text-lg font-semibold text-gray-700 mt-1">3-4 中垂線與角平分線性質 完整解析版</h2>
+                <p className="text-gray-500 text-sm mt-2">請選擇您要列印的模式。列印格式已預設優化為 A4 直式。</p>
+              </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => handlePrint('exam')}
+                  className="px-5 py-2.5 bg-indigo-50 text-indigo-600 font-semibold rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  列印考卷 (隱藏解析)
+                </button>
+                <button 
+                  onClick={() => handlePrint('solution')}
+                  className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  列印解析卷
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* A4 列印頁面主體 */}
+          <div className="w-full max-w-[98%] xl:max-w-[95%] mx-auto bg-white shadow-xl print:w-[210mm] print:max-w-[210mm] print:shadow-none min-h-[297mm] p-6 sm:p-10 print:p-0 print:m-0">
+            
+            {/* 試卷表頭 */}
+            <div className="text-center mb-8 border-b-2 border-gray-800 pb-4">
+              <h2 className="text-2xl font-extrabold tracking-wide text-gray-900">左營國中 國二下 數學科 平時測驗卷-進階</h2>
+              <h3 className="text-xl font-bold text-gray-800 mt-2">單元：3-4 中垂線與角平分線性質</h3>
+              <div className="flex justify-between mt-6 text-lg font-medium text-gray-700">
+                <span>錯題筆記 (收錄原卷 選擇8題 / 填充6題 / 計算5題)</span>
+                <span>姓名：<span className="font-bold text-xl tracking-widest border-b-2 border-gray-800 px-8 pb-1">蔡睿澄</span></span>
+              </div>
+            </div>
+
+            {/* 題目列表 */}
+            <div className={`flex flex-col ${printMode === 'exam' ? 'gap-6 print:gap-4' : 'gap-10 print:gap-10'}`}>
+              {['choice', 'fill', 'calc'].map((typeKey, groupIndex) => {
+                const groupQs = groupedQuestions[typeKey];
+                if (!groupQs) return null;
+
+                return (
+                  <div key={typeKey} className={`flex flex-col ${printMode === 'exam' ? 'gap-4 print:gap-2' : 'gap-8 print:gap-8'} ${groupIndex > 0 && printMode !== 'exam' ? 'print:break-before-page' : ''}`}>
+                    
+                    {groupQs.map((q, index) => {
+                      const isFirst = index === 0;
+                      // 動態顯示題號：選擇 1, 填充 1, 計算 1
+                      const displayId = `${index + 1}`;
+                      
+                      // 判斷選項長度來決定排版欄位數 (智慧橫式排版)
+                      const maxOptLen = q.options.length > 0 ? Math.max(...q.options.map(o => o.length)) : 0;
+                      let gridColsClass = 'grid-cols-1';
+                      if (q.options.length > 4) {
+                        gridColsClass = 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 print:grid-cols-4'; 
+                      } else if (q.options.length > 0) {
+                        if (maxOptLen <= 15) {
+                          gridColsClass = 'grid-cols-2 lg:grid-cols-4 print:grid-cols-4'; 
+                        } else if (maxOptLen <= 30) {
+                          gridColsClass = 'grid-cols-1 lg:grid-cols-2 print:grid-cols-2'; 
+                        } else {
+                          gridColsClass = 'grid-cols-1'; 
+                        }
+                      }
+
+                      // 單一題目的內容區塊
+                      const questionContent = (
+                        <div key={`${q.type}-${q.id}`} className={`flex flex-row border-b border-gray-300 ${printMode === 'exam' ? 'pb-4 print:pb-3' : 'pb-8 print:pb-8'} ${!isFirst && q.type !== 'calc' ? 'print:break-inside-avoid' : ''}`}>
+                          
+                          {/* 左側：題目區 */}
+                          <div className={`w-[60%] print:w-[65%] pr-6 border-r-2 border-dashed border-gray-300 ${q.type === 'calc' && printMode === 'exam' ? 'flex flex-col' : ''}`}>
+                            <div className="flex gap-2">
+                              <span className="font-bold text-xl whitespace-nowrap text-blue-900">
+                                {displayId}.
+                              </span>
+                              <div className="text-lg font-medium leading-relaxed text-gray-800 whitespace-pre-wrap">
+                                <MathText content={q.question} />
+                              </div>
+                            </div>
+                            
+                            {/* 支援單張或多張圖片顯示 */}
+                            {q.imageUrl && (
+                              <div className={`${printMode === 'exam' ? 'mt-2 mb-1 print:mt-1' : 'mt-4 mb-2'} pl-6`}>
+                                <img src={q.imageUrl} alt="題目附圖" className="w-auto h-auto max-w-[85%] max-h-56 rounded border border-gray-200 shadow-sm print:max-w-[80%] print:max-h-48 print:shadow-none print:border-gray-400" />
+                              </div>
+                            )}
+
+                            {q.options.length > 0 && (
+                              <div className={`${printMode === 'exam' ? 'mt-2 print:mt-1' : 'mt-4'} pl-6 grid ${gridColsClass} ${printMode === 'exam' ? 'gap-y-1 gap-x-4 print:gap-y-0' : 'gap-y-2 gap-x-4'} text-lg`}>
+                                {q.options.map((opt, idx) => (
+                                  <div key={idx} className="text-gray-700">
+                                    <MathText content={opt} />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* 填充/計算題 留白區塊 (僅在考試模式顯示) */}
+                            {q.options.length === 0 && printMode === 'exam' && (
+                              <div className={`mt-4 pl-6 flex ${q.type === 'calc' ? 'flex-col flex-grow min-h-[220px]' : 'items-end'}`}>
+                                <span className="text-lg font-medium text-gray-700 mr-2 mb-1">答：</span>
+                                {q.type !== 'calc' && <div className="border-b-2 border-gray-400 w-48 h-6"></div>}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 右側：解析區 */}
+                          <div className="w-[40%] print:w-[35%] pl-6 relative">
+                            <div className={`h-full ${printMode === 'exam' ? 'print:hidden' : ''}`}>
+                              <div className="flex items-center gap-2 mb-4 text-blue-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                                <span className="font-bold text-xl">深度解析</span>
+                                <span className="ml-auto bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-base font-bold shadow-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[50%]">
+                                  解答：<MathText content={q.correctAnswer} />
+                                </span>
+                              </div>
+                              
+                              <div className="bg-blue-50/50 p-5 rounded-lg border border-blue-100">
+                                <h4 className="font-bold text-lg sm:text-xl text-[#FF0000] mb-3"><MathText content={q.explanation.title} /></h4>
+                                <p className="text-gray-700 mb-5 leading-relaxed text-base sm:text-lg bg-yellow-100/50 p-3 rounded whitespace-pre-wrap">
+                                  <span className="font-semibold text-amber-700">💡 核心觀念：</span>
+                                  <MathText content={q.explanation.coreConcept} />
+                                </p>
+                                
+                                <ul className="space-y-4">
+                                  {q.explanation.details.map((detail, idx) => (
+                                    <li key={idx} className="text-base sm:text-lg leading-relaxed whitespace-pre-wrap">
+                                      {detail.opt && (
+                                        <span className={`font-semibold mr-2 ${q.correctAnswer !== "見解析" && q.correctAnswer !== "" && detail.opt.includes(q.correctAnswer.charAt(0)) ? 'text-green-700' : 'text-gray-800'}`}>
+                                          <MathText content={detail.opt} />
+                                        </span>
+                                      )}
+                                      <span className="text-gray-600">
+                                        <MathText content={detail.desc} />
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+                      );
+
+                      if (isFirst) {
+                        return (
+                          <div key={`wrapper-${typeKey}`} className="print:break-inside-avoid flex flex-col">
+                            {/* 題型標題標籤 */}
+                            <div className={`flex items-center border-b-2 border-gray-400 pb-2 ${printMode === 'exam' ? 'mb-2 print:mb-1' : 'mb-4'} print:border-gray-800`}>
+                              <span className={`bg-[#FF0000] text-white px-4 py-1.5 text-md font-bold rounded-t-lg tracking-widest print:bg-white print:border-2 print:text-[#FF0000] print:border-[#FF0000] print:rounded-md print:px-3`}>
+                                📝 {typeTitles[typeKey]} (共 {groupQs.length} 題)
+                              </span>
+                            </div>
+                            {questionContent}
+                          </div>
+                        );
+                      }
+
+                      return questionContent;
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 頁尾 */}
+            <div className="mt-8 text-center text-gray-400 text-sm print:block">
+              - 徹底搞懂每一題，幾何觀念不再卡關 -
+            </div>
+
+          </div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MistakeNotebook />);
+  </script>
+</body>
+</html>
